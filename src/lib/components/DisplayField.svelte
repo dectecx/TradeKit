@@ -25,12 +25,12 @@
 			: 'border-slate-200/50 hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20 bg-white/60 hover:bg-white/80 dark:bg-slate-800/40 dark:hover:bg-slate-800/60'}"
 >
 	<div class="flex flex-col items-start gap-1">
-		<span class="text-sm font-medium transition-colors {active ? 'text-primary-600 dark:text-primary-500' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'}">
+		<span class="text-sm font-medium transition-colors {active ? 'text-primary-600 dark:text-primary-400' : 'text-slate-500 dark:text-slate-300 group-hover:text-slate-600 dark:group-hover:text-slate-200'}">
 			{label}
 		</span>
 		<div class="flex items-baseline gap-1">
 			{#if displayValue}
-				<span class="text-2xl font-bold tracking-tight transition-colors {active ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-200'}">
+				<span class="text-2xl font-bold tracking-tight transition-colors {active ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-100'}">
 					{displayValue}
 				</span>
 			{:else}

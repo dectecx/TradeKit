@@ -234,20 +234,20 @@
       <!-- Fees & Taxes Detail Breakdown -->
       <div
         class="p-5 rounded-2xl border shadow-sm backdrop-blur-md
-                bg-white/60 dark:bg-slate-800/40 border-slate-200/50 dark:border-white/5"
+                bg-white/60 dark:bg-slate-800/60 border-slate-200/50 dark:border-white/10"
       >
-        <h3 class="text-xs font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase mb-4">交易成本明細</h3>
+        <h3 class="text-xs font-bold tracking-wider text-slate-400 dark:text-slate-300 uppercase mb-4">交易成本明細</h3>
         <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <span class="text-sm text-slate-500 dark:text-slate-400">買進手續費 (折數 {settings.discount})</span>
-            <span class="text-sm font-semibold dark:text-slate-200">{formatMoney(tradeResult.buyFee)}</span>
+            <span class="text-sm text-slate-500 dark:text-slate-300">買進手續費 (折數 {settings.discount})</span>
+            <span class="text-sm font-semibold dark:text-slate-100">{formatMoney(tradeResult.buyFee)}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-sm text-slate-500 dark:text-slate-400">賣出手續費 (折數 {settings.discount})</span>
-            <span class="text-sm font-semibold dark:text-slate-200">{formatMoney(tradeResult.sellFee)}</span>
+            <span class="text-sm text-slate-500 dark:text-slate-300">賣出手續費 (折數 {settings.discount})</span>
+            <span class="text-sm font-semibold dark:text-slate-100">{formatMoney(tradeResult.sellFee)}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-sm text-slate-500 dark:text-slate-400">交易稅 ({settings.isDayTrade ? "當沖 0.15%" : "一般 0.3%"})</span>
+            <span class="text-sm text-slate-500 dark:text-slate-300">交易稅 ({settings.isDayTrade ? "當沖 0.15%" : "一般 0.3%"})</span>
             <span class="text-sm font-semibold text-primary-600 dark:text-primary-400">{formatMoney(tradeResult.sellTax)}</span>
           </div>
         </div>
