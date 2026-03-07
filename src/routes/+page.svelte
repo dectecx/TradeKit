@@ -1,59 +1,38 @@
 <script lang="ts">
   import CustomNumpad from "$lib/components/CustomNumpad.svelte";
   import DisplayField from "$lib/components/DisplayField.svelte";
+  import SettingsDrawer from "$lib/components/SettingsDrawer.svelte";
+  import { settings } from "$lib/stores/settings.svelte";
   import { calculateTrade } from "$lib/utils/finance";
   import { ArrowRightLeft, Calculator, Moon, Settings, Sun, TrendingDown, TrendingUp } from "lucide-svelte";
-  import { onMount } from "svelte";
   import { fade, slide } from "svelte/transition";
 
   // ==========================================
-  // 1. Svelte 5 狀態管理 ($state)
+  // 1. Svelte 5 狀態管理 ($state 與全域狀態)
   // ==========================================
   let buyPrice = $state<string>("");
   let sellPrice = $state<string>("");
   let quantity = $state<string>("1");
 
-  // 暫時寫死的使用者設定
-  let discount = $state<string>("0.28");
-  let minFee = $state<number>(20);
-  let isDayTrade = $state<boolean>(true);
-  let isDarkMode = $state<boolean>(true); // 預設深色
-
   type InputField = "buy" | "sell" | "quantity" | null;
   let activeInput: InputField = $state<InputField>(null);
+
+  // 控制設定面板的開關
+  let isSettingsOpen = $state<boolean>(false);
 
   // ==========================================
   // 2. 主題切換邏輯
   // ==========================================
-  onMount(() => {
-    // 初始化時檢查系統偏好或 localStorage (Phase 3 會再強化)
-    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      isDarkMode = true;
-    } else {
-      isDarkMode = false;
-    }
-    updateTheme();
-  });
-
   function toggleTheme() {
-    isDarkMode = !isDarkMode;
-    updateTheme();
-  }
-
-  function updateTheme() {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    settings.isDarkMode = !settings.isDarkMode;
   }
 
   // ==========================================
   // 3. 全域鍵盤監聽支援 (Desktop Keyboard)
   // ==========================================
   function handleGlobalKeydown(e: KeyboardEvent) {
-    // 只有當焦點在某個輸入框時，才攔截鍵盤
-    if (!activeInput) return;
+    // 若設定面板開啟，或沒有鎖定輸入框時不攔截
+    if (isSettingsOpen || !activeInput) return;
 
     const key = e.key;
 
@@ -117,15 +96,21 @@
     }
   }
 
+  // ==========================================
+  // 4. 即時響應式計算 ($derived)
+  // ==========================================
   let tradeResult = $derived.by(() => {
     const b = parseFloat(buyPrice);
     const s = parseFloat(sellPrice);
     const q = parseInt(quantity);
-    const d = parseFloat(discount);
 
-    if (isNaN(b) || isNaN(s) || isNaN(q) || b <= 0 || s <= 0 || q <= 0) return null;
+    // 由於現在折數採 0~10 的表示法，須除以 10 送入核心計算引擎
+    const d = parseFloat(settings.discount) / 10;
+    const m = parseInt(settings.minFee);
 
-    return calculateTrade(b, s, q, d, minFee, isDayTrade);
+    if (isNaN(b) || isNaN(s) || isNaN(q) || b <= 0 || s <= 0 || q <= 0 || isNaN(d) || isNaN(m)) return null;
+
+    return calculateTrade(b, s, q, d, m, settings.isDayTrade);
   });
 
   const formatMoney = (num: number) => {
@@ -153,7 +138,7 @@
       class="p-2 rounded-full bg-slate-200/50 hover:bg-slate-300/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 text-slate-600 dark:text-slate-300 transition-colors"
       aria-label="切換深淺色模式"
     >
-      {#if isDarkMode}
+      {#if settings.isDarkMode}
         <Sun class="w-5 h-5" />
       {:else}
         <Moon class="w-5 h-5" />
@@ -162,7 +147,7 @@
   </header>
 
   <!-- Input Section -->
-  <div class="space-y-4 mb-6 relative z-10">
+  <div class="space-y-4 mb-6 relative transition-all {activeInput ? 'z-50' : 'z-10'}">
     <!-- 買賣雙欄位排版 -->
     <div class="grid grid-cols-2 gap-3 relative">
       <DisplayField label="買進價 (Cost)" value={buyPrice} active={activeInput === "buy"} onClick={() => (activeInput = "buy")} />
@@ -188,7 +173,7 @@
     >
       <label class="flex items-center gap-3 cursor-pointer">
         <div class="relative">
-          <input type="checkbox" bind:checked={isDayTrade} class="sr-only placeholder-peer" />
+          <input type="checkbox" bind:checked={settings.isDayTrade} class="sr-only peer" />
           <div
             class="w-11 h-6 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer
 						peer-checked:after:translate-x-full peer-checked:after:border-white after:content-['']
@@ -200,7 +185,9 @@
         <span class="text-sm font-medium text-slate-700 dark:text-slate-300">現股當沖 (稅率減半)</span>
       </label>
       <button
+        onclick={() => (isSettingsOpen = true)}
         class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-700/50 rounded-full active:scale-95 transition-all"
+        aria-label="開啟設定面板"
       >
         <Settings class="w-5 h-5" />
       </button>
@@ -252,15 +239,15 @@
         <h3 class="text-xs font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase mb-4">交易成本明細</h3>
         <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <span class="text-sm text-slate-500 dark:text-slate-400">買進手續費 (折數 {discount})</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400">買進手續費 (折數 {settings.discount})</span>
             <span class="text-sm font-semibold dark:text-slate-200">{formatMoney(tradeResult.buyFee)}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-sm text-slate-500 dark:text-slate-400">賣出手續費 (折數 {discount})</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400">賣出手續費 (折數 {settings.discount})</span>
             <span class="text-sm font-semibold dark:text-slate-200">{formatMoney(tradeResult.sellFee)}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-sm text-slate-500 dark:text-slate-400">交易稅 ({isDayTrade ? "當沖 0.15%" : "一般 0.3%"})</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400">交易稅 ({settings.isDayTrade ? "當沖 0.15%" : "一般 0.3%"})</span>
             <span class="text-sm font-semibold text-primary-600 dark:text-primary-400">{formatMoney(tradeResult.sellTax)}</span>
           </div>
         </div>
@@ -268,19 +255,26 @@
     </div>
   {/if}
 
+  <!-- 設定面板 Drawer Overlay -->
+  {#if isSettingsOpen}
+    <SettingsDrawer onClose={() => (isSettingsOpen = false)} />
+  {/if}
+
   <!-- Custom Numpad Drawer overlay & component -->
   {#if activeInput}
+    <!-- 行動版與桌機版共用的隱形遮罩 (點外側可取消焦點) -->
+    <!-- 桌機版為全透明，行動版則有毛玻璃黑幕 -->
     <button
       onclick={() => (activeInput = null)}
       in:fade={{ duration: 200 }}
       out:fade={{ duration: 200 }}
-      class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-40 w-full h-full cursor-default"
+      class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-40 w-full h-full cursor-default md:bg-transparent md:backdrop-blur-none"
       aria-label="關閉鍵盤"
     ></button>
 
-    <CustomNumpad value={currentInputValue} onInput={handleNumpadUpdate} onClose={() => (activeInput = null)} />
-
-    <!-- Fake subscription to derived value to cause handleNumpadUpdate equivalent using Svelte 5 runes context -->
-    <!-- (Since we refactored CustomNumpad to dispatch events or bind directly, the event handler approach is cleaner) -->
+    <!-- 桌機版隱藏 Numpad，完全運用實體鍵盤 -->
+    <div class="md:hidden relative z-50">
+      <CustomNumpad value={currentInputValue} onInput={handleNumpadUpdate} onClose={() => (activeInput = null)} />
+    </div>
   {/if}
 </div>
