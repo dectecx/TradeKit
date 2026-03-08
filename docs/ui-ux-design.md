@@ -1,51 +1,63 @@
 # TradeKit UI/UX 設計規範 (Design Specification)
 
 ## 總覽 (Overview)
+
 TradeKit 是一個為台灣股票市場當沖交易打造的極致精確、低阻力的工具。
 介面必須採用響應式網頁設計 (Responsive Web Design, RWD)，確保跨裝置（桌面大螢幕與行動裝置觸控）皆具備足夠的資訊清晰度與操作效率。
 
 ## 1. 美學設計方向 (Premium Fintech)
+
 設計靈感來自於高階交易終端機 (如 Bloomberg, Apple Stocks, Robinhood)。我們摒棄了傳統的「純白扁平化」設計，轉而採用具備空間感、毛玻璃質感的 UI。
 
 ### 1.1 主題設定 (Themes)
+
 應用程式支援雙主題切換：
-*   **深色模式 (預設)**：深邃的太空灰背景 (`slate-950`)、霓虹發光數字，以及高對比度，適合低光源環境下緊盯盤勢。
-*   **淺色模式**：磨砂珍珠白背景 (`slate-50`)、柔和的陰影，適合白天或戶外環境，提供乾淨的閱讀體驗。
+
+- **深色模式 (預設)**：深邃的太空灰背景 (`slate-950`)、霓虹發光數字，以及高對比度，適合低光源環境下緊盯盤勢。
+- **淺色模式**：磨砂珍珠白背景 (`slate-50`)、柔和的陰影，適合白天或戶外環境，提供乾淨的閱讀體驗。
 
 ### 1.2 色彩計畫 (Color Palette)
+
 極力避免使用死板的純黑 (`#000`)、純白 (`#FFF`) 或預設大色塊。
 **注意：遵循台灣股市習慣 (紅漲綠跌)**
-*   **獲利 (上漲/紅)**：
-    *   深色模式：`text-rose-400` 搭配發光陰影 `drop-shadow-[0_0_8px_rgba(251,113,133,0.5)]`。
-    *   淺色模式：`text-rose-600` 或 `bg-rose-500` 面板。
-*   **虧損 (下跌/綠)**：
-    *   深色模式：`text-emerald-400` 搭配發光陰影 `drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]`。
-    *   淺色模式：`text-emerald-600` 或 `bg-emerald-500` 面板。
-*   **品牌主色**：賽博藍 (Cyber Blue, `sky-500` / `blue-500`)。
+
+- **獲利 (上漲/紅)**：
+  - 深色模式：`text-rose-400` 搭配發光陰影 `drop-shadow-[0_0_8px_rgba(251,113,133,0.5)]`。
+  - 淺色模式：`text-rose-600` 或 `bg-rose-500` 面板。
+- **虧損 (下跌/綠)**：
+  - 深色模式：`text-emerald-400` 搭配發光陰影 `drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]`。
+  - 淺色模式：`text-emerald-600` 或 `bg-emerald-500` 面板。
+- **品牌主色**：賽博藍 (Cyber Blue, `sky-500` / `blue-500`)。
 
 ### 1.3 材質與表面 (Glassmorphism 毛玻璃)
+
 卡片與互動元素應透過背景模糊效果 (backdrop filter) 懸浮於背景之上。
-*   **面板面板**：深色使用 `bg-white/5`，淺色使用 `bg-white/80`，並結合 `backdrop-blur-xl`。
-*   **邊框**：使用超細邊框 `border-white/10` 勾勒邊緣，增加質感而不顯笨重。
+
+- **面板面板**：深色使用 `bg-white/5`，淺色使用 `bg-white/80`，並結合 `backdrop-blur-xl`。
+- **邊框**：使用超細邊框 `border-white/10` 勾勒邊緣，增加質感而不顯笨重。
 
 ## 2. 互動設計 (Interaction Design)
 
 ### 2.1 跨裝置輸入體驗困境 (RWD Input Strategy)
+
 手機瀏覽器在遇到 `<input type="number">` 時會強制彈出作業系統原生數字鍵盤 (iOS/Android)，這會破壞沉浸感並遮擋金融數據。
 
 **解決方案：**
+
 1.  **手機端**：我們使用假輸入框 (偽裝成 input 的 `<button>`)。點擊時，會從底部彈出我們自定義的 `<CustomNumpad />` 數字盤。
 2.  **電腦端**：當假輸入框處於「啟動 (active)」狀態時，全域 `<svelte:window onkeydown />` 監聽器會攔截實體鍵盤的敲擊 (`0-9`, `.`, `Backspace`, `Enter`)，並將數值直接寫入狀態中，完美還原一般打字體驗。
 
 ### 2.2 字體排版與視覺回饋
-*   數字必須使用等寬或幾何清晰的字型 (如 `Inter` 或 `Outfit` )。
-*   目前正在輸入的欄位必須有閃爍的光標指示器 (`animate-pulse`)。
-*   狀態切換或數字面板彈出應使用 Svelte 內建的 `slide` 或 `fade` 進行微動畫過渡。
+
+- 數字必須使用等寬或幾何清晰的字型 (如 `Inter` 或 `Outfit` )。
+- 目前正在輸入的欄位必須有閃爍的光標指示器 (`animate-pulse`)。
+- 狀態切換或數字面板彈出應使用 Svelte 內建的 `slide` 或 `fade` 進行微動畫過渡。
 
 ### 2.3 表單驗證與回饋 (Form Validation UX)
-*   **即時錯誤標示 (Inline Validation Feedback)**：當使用者輸入無效資料時，切勿使用 `alert` 或粗暴地自動蓋掉數值。應在該輸入框下方以紅字 (`text-rose-500`) 明確指出錯誤原因，並將輸入框邊框變更為紅色，保留使用者的原始輸入。
-*   **自我修復 (Error Recovery)**：當使用者開始重新輸入或修改時，必須即時清除錯誤紅字與紅框。
-*   **架構解耦 (Architecture Decoupling)**：所有資料校驗必須在 Schema 層 (例如 Zod) 中定義，並由元件呼叫；驗證提示文字必須依循 i18n 原則，從外部字典檔 (如 `messages.ts`) 引入，嚴禁將錯誤文字或防呆邏輯硬編碼 (Hardcode) 於 UI 元件內。
+
+- **即時錯誤標示 (Inline Validation Feedback)**：當使用者輸入無效資料時，切勿使用 `alert` 或粗暴地自動蓋掉數值。應在該輸入框下方以紅字 (`text-rose-500`) 明確指出錯誤原因，並將輸入框邊框變更為紅色，保留使用者的原始輸入。
+- **自我修復 (Error Recovery)**：當使用者開始重新輸入或修改時，必須即時清除錯誤紅字與紅框。
+- **架構解耦 (Architecture Decoupling)**：所有資料校驗必須在 Schema 層 (例如 Zod) 中定義，並由元件呼叫；驗證提示文字必須依循 i18n 原則，從外部字典檔 (如 `messages.ts`) 引入，嚴禁將錯誤文字或防呆邏輯硬編碼 (Hardcode) 於 UI 元件內。
 
 ## 3. UI 模組 ASCII 線稿參考 (Layout Wireframe)
 
