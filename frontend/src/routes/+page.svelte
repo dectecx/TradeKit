@@ -126,14 +126,22 @@
         onClick={() => (activeInput = 'buy')}
       />
 
-      <div
-        class="absolute top-1/2 left-1/2 z-10 flex h-10
-				w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full
-				border border-slate-200/50 bg-white/80 text-slate-400 shadow-sm backdrop-blur-md
-                dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-500"
+      <button
+        type="button"
+        aria-label="交換買賣價"
+        onclick={() => {
+          const temp = buyPrice;
+          buyPrice = sellPrice;
+          sellPrice = temp;
+          if (activeInput === 'buy') activeInput = 'sell';
+          else if (activeInput === 'sell') activeInput = 'buy';
+        }}
+        class="absolute top-1/2 left-1/2 z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full
+				border border-slate-200/50 bg-white/80 text-slate-400 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-90
+                dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-500 dark:hover:text-sky-400"
       >
         <ArrowRightLeft class="h-4 w-4" />
-      </div>
+      </button>
 
       <DisplayField
         label="賣出價 (Sell)"
