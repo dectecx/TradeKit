@@ -151,12 +151,29 @@
       />
     </div>
 
-    <DisplayField
-      label="交易張數 (Qty)"
-      value={quantity}
-      active={activeInput === 'quantity'}
-      onClick={() => (activeInput = 'quantity')}
-    />
+    <div class="space-y-3">
+      <DisplayField
+        label="交易張數 (Qty)"
+        value={quantity}
+        active={activeInput === 'quantity'}
+        onClick={() => (activeInput = 'quantity')}
+      />
+      <!-- 快速張數選擇器 -->
+      <div class="flex items-center gap-2">
+        {#each [1, 2, 5, 10] as num}
+          <button
+            type="button"
+            onclick={() => {
+              quantity = num.toString();
+              if (activeInput === 'quantity') activeInput = null;
+            }}
+            class="flex-1 rounded-xl border border-slate-200/50 bg-white/60 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-95 dark:border-white/5 dark:bg-slate-800/40 dark:text-slate-300 dark:hover:text-sky-400"
+          >
+            {num} 張
+          </button>
+        {/each}
+      </div>
+    </div>
 
     <!-- Switch / Day Trade Toggle -->
     <div
