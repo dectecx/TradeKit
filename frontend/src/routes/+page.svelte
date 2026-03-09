@@ -160,10 +160,10 @@
           <input type="checkbox" bind:checked={settings.isDayTrade} class="peer sr-only" />
           <div
             class="peer h-6 w-11 rounded-full bg-slate-300 shadow-inner
-						peer-checked:bg-sky-500 peer-focus:outline-none after:absolute
-						after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full
-						after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full
-						peer-checked:after:border-white dark:bg-slate-700"
+						peer-checked:bg-sky-500 peer-focus:outline-none after:absolute after:top-[2px]
+						after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border
+						after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white
+						dark:bg-slate-700 dark:peer-checked:bg-sky-500"
           ></div>
         </div>
         <span class="text-sm font-medium text-slate-700 dark:text-slate-300">現股當沖 (稅率減半)</span>
@@ -228,9 +228,15 @@
             >
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500 dark:text-slate-400"
-              >交易稅 ({settings.isDayTrade ? '當沖 0.15%' : '一般 0.3%'})</span
-            >
+            <span class="text-sm text-slate-500 dark:text-slate-400">
+              交易稅 (
+              {#if settings.isDayTrade}
+                <span class="font-semibold text-orange-500 dark:text-orange-400">當沖 0.15%</span>
+              {:else}
+                一般 0.3%
+              {/if}
+              )
+            </span>
             <span class="text-sm font-semibold text-sky-600 dark:text-sky-400">{formatMoney(tradeResult.sellTax)}</span>
           </div>
         </div>
