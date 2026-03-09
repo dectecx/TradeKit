@@ -14,9 +14,9 @@
 
   // 點擊完成按鈕或是背景黑幕，執行 Schema 驗證
   function handleClose() {
-    // 預先對字串進行基礎轉換，讓 Zod 進行純粹的資料防守
-    const parsedDiscount = rawDiscount.trim() === '' ? NaN : Number(rawDiscount);
-    const parsedMinFee = rawMinFee.trim() === '' ? NaN : Number(rawMinFee);
+    // 預先對字串進行基礎轉換，讓 Zod 進行純粹的資料防守，並使用 String() 強制轉型以防 bind:value 回傳數字
+    const parsedDiscount = String(rawDiscount).trim() === '' ? NaN : Number(rawDiscount);
+    const parsedMinFee = String(rawMinFee).trim() === '' ? NaN : Number(rawMinFee);
 
     const result = settingsSchema.safeParse({
       discount: parsedDiscount,
