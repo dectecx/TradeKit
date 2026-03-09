@@ -1,10 +1,9 @@
 <script lang="ts">
   import CustomNumpad from '$lib/components/CustomNumpad.svelte';
   import DisplayField from '$lib/components/DisplayField.svelte';
-  import SettingsDrawer from '$lib/components/SettingsDrawer.svelte';
   import { settings } from '$lib/stores/settings.svelte';
   import { calculateTrade } from '$lib/utils/finance';
-  import { ArrowRightLeft, Calculator, Moon, Settings, Sun, TrendingDown, TrendingUp } from 'lucide-svelte';
+  import { ArrowRightLeft, TrendingDown, TrendingUp } from 'lucide-svelte';
   import { fade, slide } from 'svelte/transition';
 
   // ==========================================
@@ -17,22 +16,12 @@
   type InputField = 'buy' | 'sell' | 'quantity' | null;
   let activeInput: InputField = $state<InputField>(null);
 
-  // 控制設定面板的開關
-  let isSettingsOpen = $state<boolean>(false);
-
   // ==========================================
-  // 2. 主題切換邏輯
-  // ==========================================
-  function toggleTheme() {
-    settings.isDarkMode = !settings.isDarkMode;
-  }
-
-  // ==========================================
-  // 3. 全域鍵盤監聽支援 (Desktop Keyboard)
+  // 2. 全域鍵盤監聽支援 (Desktop Keyboard)
   // ==========================================
   function handleGlobalKeydown(e: KeyboardEvent) {
-    // 若設定面板開啟，或沒有鎖定輸入框時不攔截
-    if (isSettingsOpen || !activeInput) return;
+    // 沒有鎖定輸入框時不攔截
+    if (!activeInput) return;
 
     const key = e.key;
 
@@ -97,7 +86,7 @@
   }
 
   // ==========================================
-  // 4. 即時響應式計算 ($derived)
+  // 3. 即時響應式計算 ($derived)
   // ==========================================
   let tradeResult = $derived.by(() => {
     const b = parseFloat(buyPrice);
@@ -125,27 +114,7 @@
 <!-- 全域鍵盤事件攔截器 -->
 <svelte:window onkeydown={handleGlobalKeydown} />
 
-<div class="relative mx-auto min-h-screen max-w-md p-4 pb-24 transition-colors duration-300">
-  <!-- Header -->
-  <header class="mb-6 flex items-center justify-between pt-2">
-    <div class="flex items-center gap-2">
-      <Calculator class="text-primary-500 h-6 w-6" />
-      <h1 class="text-2xl font-bold tracking-tight dark:text-white">TradeKit</h1>
-    </div>
-
-    <button
-      onclick={toggleTheme}
-      class="rounded-full bg-slate-200/50 p-2 text-slate-600 transition-colors hover:bg-slate-300/50 dark:bg-slate-800/50 dark:text-slate-300 dark:hover:bg-slate-700/50"
-      aria-label="切換深淺色模式"
-    >
-      {#if settings.isDarkMode}
-        <Sun class="h-5 w-5" />
-      {:else}
-        <Moon class="h-5 w-5" />
-      {/if}
-    </button>
-  </header>
-
+<div class="relative mx-auto w-full max-w-lg pb-24 transition-colors duration-300">
   <!-- Input Section -->
   <div class="relative mb-6 space-y-4 transition-all {activeInput ? 'z-50' : 'z-10'}">
     <!-- 買賣雙欄位排版 -->
@@ -181,7 +150,7 @@
       onClick={() => (activeInput = 'quantity')}
     />
 
-    <!-- Switch & Settings row -->
+    <!-- Switch / Day Trade Toggle -->
     <div
       class="flex items-center justify-between rounded-2xl border border-slate-200/50 bg-white/60 p-4
             shadow-sm backdrop-blur-md transition-colors dark:border-white/5 dark:bg-slate-800/40"
@@ -190,22 +159,15 @@
         <div class="relative">
           <input type="checkbox" bind:checked={settings.isDayTrade} class="peer sr-only" />
           <div
-            class="peer peer-checked:bg-primary-500 h-6 w-11 rounded-full bg-slate-300 shadow-inner
-						peer-focus:outline-none after:absolute after:top-[2px]
-						after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border
-						after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full
+            class="peer h-6 w-11 rounded-full bg-slate-300 shadow-inner
+						peer-checked:bg-sky-500 peer-focus:outline-none after:absolute
+						after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full
+						after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full
 						peer-checked:after:border-white dark:bg-slate-700"
           ></div>
         </div>
         <span class="text-sm font-medium text-slate-700 dark:text-slate-300">現股當沖 (稅率減半)</span>
       </label>
-      <button
-        onclick={() => (isSettingsOpen = true)}
-        class="rounded-full bg-slate-100 p-2 text-slate-400 transition-all hover:text-slate-700 active:scale-95 dark:bg-slate-700/50 dark:hover:text-slate-200"
-        aria-label="開啟設定面板"
-      >
-        <Settings class="h-5 w-5" />
-      </button>
     </div>
   </div>
 
@@ -254,29 +216,26 @@
         <h3 class="mb-4 text-xs font-bold tracking-wider text-slate-400 uppercase dark:text-slate-300">交易成本明細</h3>
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500 dark:text-slate-300">買進手續費 (折數 {settings.discount})</span>
-            <span class="text-sm font-semibold dark:text-slate-100">{formatMoney(tradeResult.buyFee)}</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400">買進手續費 (折數 {settings.discount})</span>
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+              >{formatMoney(tradeResult.buyFee)}</span
+            >
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500 dark:text-slate-300">賣出手續費 (折數 {settings.discount})</span>
-            <span class="text-sm font-semibold dark:text-slate-100">{formatMoney(tradeResult.sellFee)}</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400">賣出手續費 (折數 {settings.discount})</span>
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-200"
+              >{formatMoney(tradeResult.sellFee)}</span
+            >
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500 dark:text-slate-300"
+            <span class="text-sm text-slate-500 dark:text-slate-400"
               >交易稅 ({settings.isDayTrade ? '當沖 0.15%' : '一般 0.3%'})</span
             >
-            <span class="text-primary-600 dark:text-primary-400 text-sm font-semibold"
-              >{formatMoney(tradeResult.sellTax)}</span
-            >
+            <span class="text-sm font-semibold text-sky-600 dark:text-sky-400">{formatMoney(tradeResult.sellTax)}</span>
           </div>
         </div>
       </div>
     </div>
-  {/if}
-
-  <!-- 設定面板 Drawer Overlay -->
-  {#if isSettingsOpen}
-    <SettingsDrawer onClose={() => (isSettingsOpen = false)} />
   {/if}
 
   <!-- Custom Numpad Drawer overlay & component -->

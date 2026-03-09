@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { calculateFee, calculateTax, getTickSize, calculateTrade } from './finance';
+import { describe, expect, it } from 'vitest';
+import { calculateFee, calculateTax, calculateTrade, getTickSize } from './finance';
 
 describe('TradeKit Financial Calculations', () => {
   describe('Fee Calculation (無條件捨去)', () => {
