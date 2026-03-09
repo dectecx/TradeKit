@@ -108,3 +108,117 @@ export function calculateTrade(
     profit,
   };
 }
+
+/**
+ * 取得上一個跳動檔位加一檔的價位
+ * (過渡級距時能自動應對，例如 99.9 加上一檔會變成 100.0)
+ */
+export function getNextTick(price: number | string): number {
+  const p = new Decimal(price);
+  const tickSize = getTickSize(p.toNumber());
+  // 處理跨級距問題: 若 p = 99.9, tickSize = 0.1, 99.9 + 0.1 = 100.0 (下一檔 tickSize 變為 0.5 但不影響這次跨越)
+  return p.plus(tickSize).toNumber();
+}
+
+/**
+ * 取得下一個跳動檔位減一檔的價位
+ * (過度級距時需參考退一級的 tick size，例如 100.0 減一檔是由 99.9 跳上來的，所以減 0.1)
+ */
+export function getPrevTick(price: number | string): number {
+  const p = new Decimal(price);
+
+  // 為了精確抓取往下的級距，我們先稍微減去一點點極小值，來判斷究竟屬於哪個位階
+  // 例如 p = 100.0 時，100.0 所在的 getTickSize 是 0.5 (即 100 變 100.5)
+  // 但往下減必須是減 0.1 (變成 99.9)
+  const bracketPrice = p.minus(0.0001).toNumber();
+  const tickSize = getTickSize(bracketPrice);
+
+  // 台股最低價不可小於等於0
+  return Decimal.max(p.minus(tickSize), new Decimal(0.01)).toNumber();
+}
+
+export type TickLadderRow = {
+  price: number;
+  ticks: number; // 與基準價的距離 (正數為上漲，負數為下跌)
+  profit: number; // 淨損益 (包含手續費與稅)
+};
+
+/**
+ * 產生價位階梯推演表 (包含做多/做空邏輯)
+ *
+ * @param basePrice 基準價 (做多為買進價，做空為賣出價)
+ * @param quantity 張數
+ * @param discount 折數
+ * @param minFee 最低手續費
+ * @param isDayTrade 是否為當沖
+ * @param direction 'long' (做多) 或 'short' (做空)
+ * @param upTicks 往上顯示幾檔 (預設 5)
+ * @param downTicks 往下顯示幾檔 (預設 5)
+ * @returns 包含各檔位詳細數據陣列 (由高價位排到低價位)
+ */
+export function generateTickLadder(
+  basePrice: number | string,
+  quantity: number,
+  discount: number | string,
+  minFee: number = 20,
+  isDayTrade: boolean = false,
+  direction: 'long' | 'short' = 'long',
+  upTicks: number = 5,
+  downTicks: number = 5
+): TickLadderRow[] {
+  const ladder: TickLadderRow[] = [];
+  const base = new Decimal(basePrice).toNumber();
+
+  if (isNaN(base) || base <= 0) return [];
+
+  // 1. 生成往上跳的檔位
+  let currentPrice = base;
+  for (let i = 1; i <= upTicks; i++) {
+    currentPrice = getNextTick(currentPrice);
+    const result =
+      direction === 'long'
+        ? calculateTrade(base, currentPrice, quantity, discount, minFee, isDayTrade)
+        : calculateTrade(currentPrice, base, quantity, discount, minFee, isDayTrade);
+
+    ladder.push({
+      price: currentPrice,
+      ticks: i,
+      profit: result.profit,
+    });
+  }
+
+  // 2. 為了確保顯示是由大(高價)到小(低價)，將剛才生成的上漲區段顛倒
+  ladder.reverse();
+
+  // 3. 加入基準價(0檔)
+  const baseResult =
+    direction === 'long'
+      ? calculateTrade(base, base, quantity, discount, minFee, isDayTrade)
+      : calculateTrade(base, base, quantity, discount, minFee, isDayTrade);
+
+  ladder.push({
+    price: base,
+    ticks: 0,
+    profit: baseResult.profit,
+  });
+
+  // 4. 生產往下跳的檔位
+  currentPrice = base;
+  for (let i = 1; i <= downTicks; i++) {
+    currentPrice = getPrevTick(currentPrice);
+    if (currentPrice <= 0) break; // 避免跌破0
+
+    const result =
+      direction === 'long'
+        ? calculateTrade(base, currentPrice, quantity, discount, minFee, isDayTrade)
+        : calculateTrade(currentPrice, base, quantity, discount, minFee, isDayTrade);
+
+    ladder.push({
+      price: currentPrice,
+      ticks: -i,
+      profit: result.profit,
+    });
+  }
+
+  return ladder;
+}
