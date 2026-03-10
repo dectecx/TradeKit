@@ -127,6 +127,22 @@
             輸入 0~10。舉例：免手續費為 0，無折讓為 10，2.8 折請輸入 2.8
           </p>
         {/if}
+
+        <!-- 快速折數選擇器 -->
+        <div class="flex items-center gap-2 pt-1">
+          {#each [0, 2.8, 5, 6, 10] as num}
+            <button
+              type="button"
+              onclick={() => {
+                rawDiscount = num.toString();
+                clearError('discount');
+              }}
+              class="flex-1 rounded-xl border border-slate-200/50 bg-white/60 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-95 dark:border-white/5 dark:bg-slate-800/40 dark:text-slate-300 dark:hover:text-sky-400"
+            >
+              {num === 0 ? '免手續' : num === 10 ? '無折讓' : num + ' 折'}
+            </button>
+          {/each}
+        </div>
       </div>
 
       <!-- 單筆最低手續費 -->
@@ -162,6 +178,22 @@
         {:else}
           <p class="text-xs text-slate-400 dark:text-slate-500">一般券商為 20 元，大戶方案可能為 1 元。</p>
         {/if}
+
+        <!-- 快速低消選擇器 -->
+        <div class="flex items-center gap-2 pt-1">
+          {#each [20, 1, 0] as num}
+            <button
+              type="button"
+              onclick={() => {
+                rawMinFee = num.toString();
+                clearError('minFee');
+              }}
+              class="flex-1 rounded-xl border border-slate-200/50 bg-white/60 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-95 dark:border-white/5 dark:bg-slate-800/40 dark:text-slate-300 dark:hover:text-sky-400"
+            >
+              {num} 元
+            </button>
+          {/each}
+        </div>
       </div>
 
       <!-- 預設顯示階梯檔位數 -->
