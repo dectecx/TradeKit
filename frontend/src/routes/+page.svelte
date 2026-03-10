@@ -39,6 +39,10 @@
   // ==========================================
   function handleGlobalKeydown(e: KeyboardEvent) {
     if (!activeInput) return;
+
+    // 如果控制權交在原生的 input 手上，不再透過 global 事件重複寫入
+    if (document.activeElement?.tagName === 'INPUT') return;
+
     const key = e.key;
 
     if (/^[0-9\.]$/.test(key)) {
@@ -195,7 +199,7 @@
           <div class="relative grid grid-cols-2 gap-3" transition:slide={{ duration: 200 }}>
             <DisplayField
               label="買進價 (Cost)"
-              value={buyPrice}
+              bind:value={buyPrice}
               active={activeInput === 'buy'}
               onClick={() => (activeInput = 'buy')}
             />
@@ -219,7 +223,7 @@
 
             <DisplayField
               label="賣出價 (Sell)"
-              value={sellPrice}
+              bind:value={sellPrice}
               active={activeInput === 'sell'}
               onClick={() => (activeInput = 'sell')}
             />
@@ -259,7 +263,7 @@
 
             <DisplayField
               label="基準價 (Base Price)"
-              value={basePrice}
+              bind:value={basePrice}
               active={activeInput === 'base'}
               onClick={() => (activeInput = 'base')}
             />
@@ -269,7 +273,7 @@
         <div class="space-y-3">
           <DisplayField
             label="交易張數 (Qty)"
-            value={quantity}
+            bind:value={quantity}
             active={activeInput === 'quantity'}
             onClick={() => (activeInput = 'quantity')}
           />
@@ -520,12 +524,9 @@
   <!-- Custom Numpad Drawer overlay & component -->
   {#if activeInput}
     <!-- 行動版與桌機版共用的隱形遮罩 (點外側可取消焦點) -->
-    <!-- 桌機版為全透明，行動版則有毛玻璃黑幕 -->
     <button
       onclick={() => (activeInput = null)}
-      in:fade={{ duration: 200 }}
-      out:fade={{ duration: 200 }}
-      class="fixed inset-0 z-40 h-full w-full cursor-default bg-slate-900/40 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none dark:bg-black/60"
+      class="fixed inset-0 z-40 h-full w-full cursor-default bg-transparent"
       aria-label="關閉鍵盤"
     ></button>
 
