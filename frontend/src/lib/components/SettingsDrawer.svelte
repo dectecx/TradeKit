@@ -8,6 +8,7 @@
   // 使用本地 state 暫存輸入值，避免未驗證字串直接污染全域 settings
   let rawDiscount = $state<string>(settings.discount);
   let rawMinFee = $state<string>(settings.minFee);
+  let rawDefaultLadderRows = $state<string>(settings.defaultLadderRows.toString());
 
   // 紀錄各欄位的錯誤訊息
   let errors = $state<Record<string, string>>({});
@@ -17,10 +18,12 @@
     // 預先對字串進行基礎轉換，讓 Zod 進行純粹的資料防守，並使用 String() 強制轉型以防 bind:value 回傳數字
     const parsedDiscount = String(rawDiscount).trim() === '' ? NaN : Number(rawDiscount);
     const parsedMinFee = String(rawMinFee).trim() === '' ? NaN : Number(rawMinFee);
+    const parsedDefaultLadderRows = String(rawDefaultLadderRows).trim() === '' ? NaN : Number(rawDefaultLadderRows);
 
     const result = settingsSchema.safeParse({
       discount: parsedDiscount,
       minFee: parsedMinFee,
+      defaultLadderRows: parsedDefaultLadderRows,
       isDayTrade: settings.isDayTrade,
       isDarkMode: settings.isDarkMode,
     });
@@ -43,6 +46,7 @@
     // 移除無限小數尾數，例如 2.800000 -> 2.8
     settings.discount = parsedDiscount.toString();
     settings.minFee = parsedMinFee.toString();
+    settings.defaultLadderRows = parsedDefaultLadderRows;
     onClose();
   }
 
@@ -159,6 +163,42 @@
           <p class="text-xs text-slate-400 dark:text-slate-500">一般券商為 20 元，大戶方案可能為 1 元。</p>
         {/if}
       </div>
+
+      <!-- 預設顯示階梯檔位數 -->
+      <div class="space-y-2">
+        <label
+          for="ladderRowsLabel"
+          class="block text-sm font-semibold {errors.defaultLadderRows
+            ? 'text-rose-500 dark:text-rose-400'
+            : 'text-slate-700 dark:text-slate-300'}"
+        >
+          預設顯示推演檔位
+        </label>
+        <div class="relative">
+          <input
+            id="ladderRowsLabel"
+            type="number"
+            inputmode="numeric"
+            step="1"
+            bind:value={rawDefaultLadderRows}
+            oninput={() => clearError('defaultLadderRows')}
+            class="w-full border bg-slate-50 pr-16 dark:bg-slate-950 {errors.defaultLadderRows
+              ? 'border-rose-500 ring-2 ring-rose-500/20'
+              : 'focus:ring-primary-500/50 border-slate-200 dark:border-white/10'} [appearance:textfield] rounded-xl px-4 py-3 text-lg font-medium text-slate-900 shadow-inner transition-all outline-none focus:ring-2 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            placeholder="例如：5"
+          />
+          <div class="absolute top-1/2 right-4 -translate-y-1/2 font-medium text-slate-400">檔</div>
+        </div>
+
+        {#if errors.defaultLadderRows}
+          <p class="mt-1 text-sm font-medium text-rose-500 dark:text-rose-400" transition:slide={{ duration: 150 }}>
+            {errors.defaultLadderRows}
+          </p>
+        {:else}
+          <p class="text-xs text-slate-400 dark:text-slate-500">預設為上下各 5 檔。數量過多可能影響算圖效能。</p>
+        {/if}
+      </div>
+
     </div>
   </div>
 </div>

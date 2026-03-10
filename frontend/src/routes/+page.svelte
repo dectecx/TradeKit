@@ -3,7 +3,7 @@
   import DisplayField from '$lib/components/DisplayField.svelte';
   import { settings } from '$lib/stores/settings.svelte';
   import { calculateTrade, generateTickLadder } from '$lib/utils/finance';
-  import { ArrowRightLeft, TrendingDown, TrendingUp, ListEnd } from 'lucide-svelte';
+  import { ArrowRightLeft, ListEnd, TrendingDown, TrendingUp } from 'lucide-svelte';
   import { fade, slide } from 'svelte/transition';
 
   // ==========================================
@@ -102,8 +102,21 @@
   }
 
   // ==========================================
-  // 3. 即時響應式計算 ($derived)
+  // 3. 即時響應式計算 ($derived) 與特效 ($effect)
   // ==========================================
+
+  // 階梯行數控制
+  let ladderRows = $state<number>(settings.defaultLadderRows);
+
+  // 當使用者重新編輯基準價、方向、或張數時，自動將階梯行數重置為設定檔的預設值
+  // 使用 $derived 計算這些依賴項的簽名，若有變動則觸發重置
+  let ladderDependencies = $derived(`${basePrice}-${quantity}-${tradeDirection}-${settings.isDayTrade}-${settings.defaultLadderRows}`);
+  $effect(() => {
+    // 依賴項變動時，強制將行數歸位，避免舊的展開狀態殘留
+    if (ladderDependencies) {
+      ladderRows = settings.defaultLadderRows;
+    }
+  });
 
   // 單筆試算結果
   let singleTradeResult = $derived.by(() => {
@@ -131,7 +144,7 @@
 
     if (isNaN(b) || b <= 0 || isNaN(q) || q <= 0 || isNaN(d) || isNaN(m)) return null;
 
-    return generateTickLadder(b, q, d, m, settings.isDayTrade, tradeDirection, 5, 5);
+    return generateTickLadder(b, q, d, m, settings.isDayTrade, tradeDirection, ladderRows, ladderRows);
   });
 
   const formatMoney = (num: number) => {
@@ -292,10 +305,32 @@
     </div>
   </div>
 
+  <!-- 空值預設畫面 (Empty State) -->
+  {#snippet EmptyState(title: string, desc: string)}
+    <div in:fade={{ duration: 300 }} class="flex flex-col items-center justify-center py-12 text-center">
+      <div
+        class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-200/50 text-slate-400 dark:bg-slate-800/50 dark:text-slate-500"
+      >
+        <ListEnd class="h-8 w-8" />
+      </div>
+      <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300">{title}</h3>
+      <p class="mt-2 max-w-[200px] text-sm text-slate-500 dark:text-slate-400">{desc}</p>
+    </div>
+  {/snippet}
+
+  {#if calcMode === 'single' && !singleTradeResult}
+    {@render EmptyState('等待輸入價位', '請在上方輸入買進與賣出價，以進行精確的手續費與損益計算。')}
+  {/if}
+
+  {#if calcMode === 'ladder' && !ladderResult}
+    {@render EmptyState('等待設定基準價', '輸入您的進場價位與張數，系統將自動推演高達 11 檔的報酬率價位表。')}
+  {/if}
+
   <!-- Single Entry Results Section -->
   {#if calcMode === 'single' && singleTradeResult}
     <div in:slide={{ duration: 300 }} class="relative z-0 mb-32 space-y-4">
-      <!-- Profit Card (遵守台股顏色: 紅漲綠跌) -->
+      <!-- (Single Result Block remains unchanged) -->
+      <!-- ... -->
       <div
         class="relative overflow-hidden rounded-3xl border border-white/10 p-6 text-white shadow-xl backdrop-blur-xl
 				{singleTradeResult.profit >= 0
@@ -382,11 +417,19 @@
           <div class="text-right">預估損益</div>
         </div>
 
+        <!-- 向上展開按鈕 -->
+        <button
+          onclick={() => (ladderRows += 5)}
+          class="w-full border-b border-slate-100 bg-white/30 py-2.5 text-xs font-bold text-slate-400 transition-colors hover:bg-slate-100 hover:text-sky-500 active:bg-slate-200 dark:border-white/5 dark:bg-slate-800/20 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+        >
+          + 展開更多高價位檔次
+        </button>
+
         <!-- 表格 Body -->
         <div class="flex flex-col">
           {#each ladderResult as row}
             <div
-              class="grid grid-cols-3 items-center border-t border-slate-100 px-5 py-3 transition-colors hover:bg-slate-50/50 dark:border-white/5 dark:hover:bg-slate-800/30
+              class="grid grid-cols-3 items-center border-b border-slate-100 px-5 py-3 transition-colors hover:bg-slate-50/50 dark:border-white/5 dark:hover:bg-slate-800/30
               {row.ticks === 0 ? 'bg-sky-50/50 dark:bg-sky-900/10' : ''}"
             >
               <!-- 價位 -->
@@ -431,6 +474,14 @@
             </div>
           {/each}
         </div>
+
+        <!-- 向下展開按鈕 -->
+        <button
+          onclick={() => (ladderRows += 5)}
+          class="w-full bg-white/30 py-2.5 text-xs font-bold text-slate-400 transition-colors hover:bg-slate-100 hover:text-sky-500 active:bg-slate-200 dark:bg-slate-800/20 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+        >
+          + 展開更多低價位檔次
+        </button>
       </div>
 
       <!-- 提示訊息框 -->
@@ -442,7 +493,7 @@
           損益推演表說明
         </p>
         <p class="mt-1 opacity-80">
-          此表依照台灣股市跳動單位規則，向上向下自動推算出共 11 個檔位的漲跌損益（已扣除券商手續費與證交稅）。
+          此表依照台灣股市跳動單位規則，向上向下自動推算出共 {1 + ladderRows * 2} 個檔位的漲跌損益（已扣除券商手續費與證交稅）。
         </p>
       </div>
     </div>

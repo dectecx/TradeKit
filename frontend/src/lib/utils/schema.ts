@@ -22,6 +22,15 @@ export const settingsSchema = z.object({
     .int({ message: messages.minFee.invalidType })
     .min(0, { message: messages.minFee.min }),
 
+  // 預設階梯行數 (正整數)
+  defaultLadderRows: z
+    .number({
+      message: '請輸入有效的數字',
+    })
+    .int({ message: '必須是整數' })
+    .min(1, { message: '最少顯示 1 檔' })
+    .max(50, { message: '最多顯示 50 檔，避免效能影響' }),
+
   // 布林值驗證
   isDayTrade: z.boolean(),
   isDarkMode: z.boolean(),

@@ -8,6 +8,7 @@ class SettingsStore {
   // 使用 $state 宣告核心資料
   discount = $state<string>('2.8');
   minFee = $state<string>('20');
+  defaultLadderRows = $state<number>(5);
   isDayTrade = $state<boolean>(true);
   isDarkMode = $state<boolean>(true);
 
@@ -19,6 +20,9 @@ class SettingsStore {
 
       const storedMinFee = localStorage.getItem('tk_minFee');
       if (storedMinFee) this.minFee = storedMinFee;
+
+      const storedLadderRows = localStorage.getItem('tk_defaultLadderRows');
+      if (storedLadderRows) this.defaultLadderRows = parseInt(storedLadderRows, 10);
 
       const storedIsDayTrade = localStorage.getItem('tk_isDayTrade');
       if (storedIsDayTrade !== null) this.isDayTrade = storedIsDayTrade === 'true';
@@ -42,6 +46,10 @@ class SettingsStore {
 
         $effect(() => {
           localStorage.setItem('tk_minFee', this.minFee);
+        });
+
+        $effect(() => {
+          localStorage.setItem('tk_defaultLadderRows', String(this.defaultLadderRows));
         });
 
         $effect(() => {
