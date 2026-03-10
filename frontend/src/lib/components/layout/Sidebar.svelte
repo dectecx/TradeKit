@@ -5,7 +5,7 @@
 
   // Navigation Items
   const navItems = [
-    { name: '現股當沖計算', icon: Calculator, href: '/', active: true },
+    { name: '台股 / 當沖計算機', icon: Calculator, href: '/', active: true },
     { name: '除權息試算', icon: ChartLine, href: '#', active: false },
     { name: '歷史損益', icon: History, href: '#', active: false },
   ];

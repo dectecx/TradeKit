@@ -3,7 +3,7 @@
   import { Menu, Moon, Settings, Sun } from 'lucide-svelte';
 
   let {
-    title = '現股當沖計算',
+    title = '台股 / 當沖計算機',
     onOpenSettings,
     isMobileMenuOpen = $bindable(),
   }: { title?: string; onOpenSettings: () => void; isMobileMenuOpen: boolean } = $props();

@@ -28,11 +28,13 @@
 
     <!-- Main Content Area Wrapper -->
     <div class="relative flex h-screen flex-1 flex-col overflow-hidden">
-      <Header title="現股當沖計算" onOpenSettings={() => (isSettingsOpen = true)} bind:isMobileMenuOpen />
+      <Header title="台股 / 當沖計算機" onOpenSettings={() => (isSettingsOpen = true)} bind:isMobileMenuOpen />
 
-      <main class="mx-auto w-full max-w-lg flex-1 overflow-y-auto p-4 md:max-w-3xl lg:max-w-5xl lg:p-8">
+      <main class="mx-auto flex w-full max-w-lg flex-1 flex-col overflow-y-auto p-4 md:max-w-3xl lg:max-w-5xl lg:p-8">
         <!-- 路由注入區 -->
-        {@render children()}
+        <div class="flex-1">
+          {@render children()}
+        </div>
         <Footer />
       </main>
     </div>

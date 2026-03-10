@@ -10,7 +10,7 @@
   // 1. Svelte 5 狀態管理 ($state 與全域狀態)
   // ==========================================
   type CalcMode = 'single' | 'ladder';
-  let calcMode = $state<CalcMode>('single');
+  let calcMode = $state<CalcMode>('ladder');
 
   // 單點試算模式
   let buyPrice = $state<string>('');
@@ -153,21 +153,21 @@
     <div class="flex w-full rounded-2xl bg-white/40 p-1.5 shadow-inner backdrop-blur-md dark:bg-slate-900/40">
       <button
         type="button"
-        onclick={() => (calcMode = 'single')}
-        class="flex-1 rounded-xl py-2.5 text-sm font-bold transition-all {calcMode === 'single'
-          ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-800 dark:text-sky-400'
-          : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}"
-      >
-        單筆試算
-      </button>
-      <button
-        type="button"
         onclick={() => (calcMode = 'ladder')}
         class="flex-1 rounded-xl py-2.5 text-sm font-bold transition-all {calcMode === 'ladder'
           ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-800 dark:text-sky-400'
           : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}"
       >
         損益推演
+      </button>
+      <button
+        type="button"
+        onclick={() => (calcMode = 'single')}
+        class="flex-1 rounded-xl py-2.5 text-sm font-bold transition-all {calcMode === 'single'
+          ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-800 dark:text-sky-400'
+          : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}"
+      >
+        單筆試算
       </button>
     </div>
 
