@@ -198,7 +198,6 @@
           <p class="text-xs text-slate-400 dark:text-slate-500">預設為上下各 5 檔。數量過多可能影響算圖效能。</p>
         {/if}
       </div>
-
     </div>
   </div>
 </div>
