@@ -141,6 +141,9 @@ export type TickLadderRow = {
   price: number;
   ticks: number; // 與基準價的距離 (正數為上漲，負數為下跌)
   profit: number; // 淨損益 (包含手續費與稅)
+  fee: number; // 單邊或雙邊手續費總和 (buyFee + sellFee)
+  tax: number; // 交易稅
+  percentChange: number; // 漲跌幅百分比
 };
 
 /**
@@ -184,6 +187,9 @@ export function generateTickLadder(
       price: currentPrice,
       ticks: i,
       profit: result.profit,
+      fee: result.buyFee + result.sellFee,
+      tax: result.sellTax,
+      percentChange: ((currentPrice - base) / base) * 100,
     });
   }
 
@@ -200,6 +206,9 @@ export function generateTickLadder(
     price: base,
     ticks: 0,
     profit: baseResult.profit,
+    fee: baseResult.buyFee + baseResult.sellFee,
+    tax: baseResult.sellTax,
+    percentChange: 0,
   });
 
   // 4. 生產往下跳的檔位
@@ -217,6 +226,9 @@ export function generateTickLadder(
       price: currentPrice,
       ticks: -i,
       profit: result.profit,
+      fee: result.buyFee + result.sellFee,
+      tax: result.sellTax,
+      percentChange: ((currentPrice - base) / base) * 100,
     });
   }
 

@@ -428,12 +428,23 @@
           <div
             class="overflow-hidden rounded-3xl border border-slate-200/50 bg-white/60 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60"
           >
-            <!-- 表格 Header -->
+            <!-- 表格 Header (Desktop) -->
             <div
-              class="grid grid-cols-3 bg-slate-100/50 px-5 py-3 text-xs font-bold tracking-wider text-slate-500 uppercase dark:bg-slate-800/50 dark:text-slate-400"
+              class="hidden bg-slate-100/50 px-5 py-3 text-xs font-bold tracking-wider text-slate-500 uppercase md:grid md:grid-cols-[1.2fr_1fr_1fr_0.8fr_0.8fr_1.8fr] dark:bg-slate-800/50 dark:text-slate-400"
             >
               <div class="text-left">目標價位</div>
+              <div class="text-center">漲跌幅</div>
               <div class="text-center">跳動檔位</div>
+              <div class="text-center">手續費</div>
+              <div class="text-center">交易稅</div>
+              <div class="text-right">預估損益</div>
+            </div>
+            <!-- 表格 Header (Mobile) -->
+            <div
+              class="grid grid-cols-3 bg-slate-100/50 px-5 py-3 text-[11px] font-bold tracking-wider text-slate-500 md:hidden dark:bg-slate-800/50 dark:text-slate-400"
+            >
+              <div class="text-left">價位 / 檔位</div>
+              <div class="text-center">漲跌 / 稅費</div>
               <div class="text-right">預估損益</div>
             </div>
 
@@ -449,47 +460,102 @@
             <div class="flex flex-col">
               {#each ladderResult as row}
                 <div
-                  class="grid grid-cols-3 items-center border-b border-slate-100 px-5 py-3 transition-colors hover:bg-slate-50/50 dark:border-white/5 dark:hover:bg-slate-800/30
+                  class="flex flex-col border-b border-slate-100 px-5 py-3 transition-colors hover:bg-slate-50/50 dark:border-white/5 dark:hover:bg-slate-800/30
               {row.ticks === 0 ? 'bg-sky-50/50 dark:bg-sky-900/10' : ''}"
                 >
-                  <!-- 價位 -->
-                  <div class="text-left font-sans text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100">
-                    {row.price.toFixed(2).replace(/\.?0+$/, '')}
-                  </div>
-
-                  <!-- 檔位 (Ticks) -->
-                  <div class="text-center">
-                    {#if row.ticks > 0}
-                      <span
-                        class="inline-flex h-6 w-12 items-center justify-center rounded-full bg-rose-100 text-xs font-bold text-rose-600 dark:bg-rose-500/20 dark:text-rose-400"
-                      >
-                        +{row.ticks}
-                      </span>
-                    {:else if row.ticks < 0}
-                      <span
-                        class="inline-flex h-6 w-12 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-                      >
-                        {row.ticks}
-                      </span>
-                    {:else}
-                      <span
-                        class="inline-flex items-center justify-center rounded-sm bg-sky-100 px-2 py-0.5 text-xs font-bold text-sky-600 dark:bg-sky-500/20 dark:text-sky-400"
-                      >
-                        基準價
-                      </span>
-                    {/if}
-                  </div>
-
-                  <!-- 預估損益 (Profit) -->
                   <div
-                    class="text-right font-sans text-xl font-black tracking-tight md:text-2xl
-                    {row.profit > 0
-                      ? 'text-rose-500 dark:text-rose-400'
-                      : row.profit < 0
-                        ? 'text-emerald-500 dark:text-emerald-400'
-                        : 'text-slate-500 dark:text-slate-400'}"
+                    class="grid grid-cols-3 items-center gap-y-1 md:grid-cols-[1.2fr_1fr_1fr_0.8fr_0.8fr_1.8fr] md:gap-y-0"
                   >
-                    {row.profit > 0 ? '+' : ''}{formatMoney(row.profit)}
+                    <!-- 1. 價位 (Price) & Mobile 檔位 -->
+                    <div class="text-left md:col-span-1">
+                      <div
+                        class="font-sans text-base font-bold tracking-tight text-slate-800 md:text-lg dark:text-slate-100"
+                      >
+                        {row.price.toFixed(2).replace(/\.?0+$/, '')}
+                      </div>
+                      <!-- Mobile Only: Ticks badge below price -->
+                      <div class="mt-0.5 md:hidden">
+                        {#if row.ticks > 0}
+                          <span
+                            class="inline-flex items-center justify-center rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-600 dark:bg-rose-500/20 dark:text-rose-400"
+                            >+{row.ticks} 檔</span
+                          >
+                        {:else if row.ticks < 0}
+                          <span
+                            class="inline-flex items-center justify-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+                            >{row.ticks} 檔</span
+                          >
+                        {:else}
+                          <span
+                            class="inline-flex items-center justify-center rounded-sm bg-sky-100 px-1.5 py-0.5 text-[10px] font-bold text-sky-600 dark:bg-sky-500/20 dark:text-sky-400"
+                            >基準價</span
+                          >
+                        {/if}
+                      </div>
+                    </div>
+
+                    <!-- 2. 漲跌幅 (Change %) & Mobile 稅費 -->
+                    <div class="flex flex-col items-center justify-center text-center md:col-span-1">
+                      <div
+                        class="text-sm font-bold {row.percentChange > 0
+                          ? 'text-rose-500 dark:text-rose-400'
+                          : row.percentChange < 0
+                            ? 'text-emerald-500 dark:text-emerald-400'
+                            : 'text-slate-400 dark:text-slate-500'}"
+                      >
+                        {row.percentChange > 0 ? '+' : ''}{row.percentChange.toFixed(2)}%
+                      </div>
+                      <!-- Mobile Only: Tax and Fee line below % -->
+                      <div class="mt-0.5 text-[10px] font-medium text-slate-400 md:hidden">
+                        費 {row.fee} / 稅 {row.tax}
+                      </div>
+                    </div>
+
+                    <!-- 3. Desktop Only: 檔位 (Ticks) -->
+                    <div class="hidden text-center md:col-span-1 md:block">
+                      {#if row.ticks > 0}
+                        <span
+                          class="inline-flex h-6 w-12 items-center justify-center rounded-full bg-rose-100 text-xs font-bold text-rose-600 dark:bg-rose-500/20 dark:text-rose-400"
+                          >+{row.ticks}</span
+                        >
+                      {:else if row.ticks < 0}
+                        <span
+                          class="inline-flex h-6 w-12 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+                          >{row.ticks}</span
+                        >
+                      {:else}
+                        <span
+                          class="inline-flex items-center justify-center rounded-sm bg-sky-100 px-2 py-0.5 text-xs font-bold text-sky-600 dark:bg-sky-500/20 dark:text-sky-400"
+                          >基準價</span
+                        >
+                      {/if}
+                    </div>
+
+                    <!-- 4. Desktop Only: 手續費 (Fee) -->
+                    <div
+                      class="hidden text-center text-sm font-medium text-slate-500 md:col-span-1 md:block dark:text-slate-400"
+                    >
+                      {row.fee}
+                    </div>
+
+                    <!-- 5. Desktop Only: 交易稅 (Tax) -->
+                    <div
+                      class="hidden text-center text-sm font-medium text-slate-500 md:col-span-1 md:block dark:text-slate-400"
+                    >
+                      {row.tax}
+                    </div>
+
+                    <!-- 6. 預估損益 (Profit) -->
+                    <div
+                      class="text-right font-sans text-xl font-black tracking-tight whitespace-nowrap md:col-span-1 md:text-2xl {row.profit >
+                      0
+                        ? 'text-rose-500 dark:text-rose-400'
+                        : row.profit < 0
+                          ? 'text-emerald-500 dark:text-emerald-400'
+                          : 'text-slate-500 dark:text-slate-400'}"
+                    >
+                      {row.profit > 0 ? '+' : ''}{formatMoney(row.profit)}
+                    </div>
                   </div>
                 </div>
               {/each}
