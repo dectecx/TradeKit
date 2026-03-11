@@ -69,45 +69,51 @@
     value = '';
     inputRef?.focus();
   }
+
+  // 點擊 label 或外框空白處時，自動聚焦到 input
+  function handleContainerClick() {
+    inputRef?.focus();
+  }
 </script>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-  class="group relative flex min-h-[72px] w-full items-center justify-between rounded-2xl border p-4 shadow-sm backdrop-blur-xl transition-all duration-200
+  onclick={handleContainerClick}
+  class="group relative flex min-h-[72px] w-full cursor-text items-center rounded-2xl border p-4 shadow-sm backdrop-blur-xl transition-all duration-200
         {isFocused
     ? 'border-sky-500 bg-white/90 ring-4 ring-sky-500/20 dark:bg-slate-900/90'
     : 'border-slate-200/50 bg-white/60 hover:border-slate-300 hover:bg-white/80 dark:border-white/10 dark:bg-slate-800/40 dark:hover:border-white/20 dark:hover:bg-slate-800/60'}"
 >
-  <div class="flex w-full flex-col items-start gap-1">
+  <div class="flex w-full flex-col items-start gap-1 pr-12">
     <span
-      class="pointer-events-none text-sm font-medium transition-colors {isFocused
+      class="text-sm font-medium transition-colors {isFocused
         ? 'text-sky-600 dark:text-sky-400'
         : 'text-slate-500 group-hover:text-slate-600 dark:text-slate-300 dark:group-hover:text-slate-200'}"
     >
       {label}
     </span>
-    <div class="relative flex w-full items-center pr-10">
-      <input
-        bind:this={inputRef}
-        type="text"
-        inputmode="decimal"
-        value={displayValue}
-        oninput={handleNativeInput}
-        onfocus={handleFocus}
-        onblur={handleBlur}
-        class="w-full bg-transparent text-2xl font-bold tracking-tight text-slate-900 placeholder-slate-300 outline-none dark:text-white dark:placeholder-slate-600"
-        placeholder="0"
-      />
-    </div>
+    <input
+      bind:this={inputRef}
+      type="text"
+      inputmode="decimal"
+      value={displayValue}
+      oninput={handleNativeInput}
+      onfocus={handleFocus}
+      onblur={handleBlur}
+      class="w-full bg-transparent text-2xl font-bold tracking-tight text-slate-900 placeholder-slate-300 outline-none dark:text-white dark:placeholder-slate-600"
+      placeholder="0"
+    />
   </div>
 
-  <!-- 清除按鈕 (X) -->
+  <!-- 清除按鈕 (X) — 加大點擊區域，垂直置中對齊數字 -->
   {#if value !== ''}
     <button
       type="button"
       tabindex="-1"
       onmousedown={(e) => e.preventDefault()}
       onclick={handleClear}
-      class="absolute top-1/2 right-4 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+      class="absolute top-1/2 right-2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
       aria-label="清除欄位內容"
     >
       <X class="h-5 w-5" />
