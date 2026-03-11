@@ -1,0 +1,60 @@
+# =============================================================================
+# TradeKit - Build & Deploy to Netlify
+# =============================================================================
+# Triggers on push to main branch when frontend code changes.
+# Builds the SvelteKit static site and deploys to Netlify.
+#
+# Required GitHub Secrets:
+#   NETLIFY_AUTH_TOKEN - Personal access token from https://app.netlify.com/user/applications#personal-access-tokens
+#   NETLIFY_SITE_ID   - Site ID from Netlify dashboard (Site configuration > General > Site ID)
+# =============================================================================
+
+name: 🚀 Deploy to Netlify
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".github/workflows/deploy_to_netlify.yml"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: 🧪 Run tests
+        working-directory: frontend
+        run: npm run test -- --run
+
+      - name: 🔍 Type check
+        working-directory: frontend
+        run: npm run check
+
+      - name: 🏗️ Build static site
+        working-directory: frontend
+        run: npm run build
+
+      - name: 🚀 Deploy to Netlify
+        uses: netlify/actions/cli@master
+        with:
+          args: deploy --dir=frontend/build --prod
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
