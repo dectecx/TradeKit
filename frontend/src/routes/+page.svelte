@@ -200,8 +200,8 @@
             <DisplayField
               label="買進價 (Cost)"
               bind:value={buyPrice}
-              active={activeInput === 'buy'}
-              onClick={() => (activeInput = 'buy')}
+              onFocus={() => (activeInput = 'buy')}
+              onBlur={() => (activeInput = null)}
             />
 
             <button
@@ -224,8 +224,8 @@
             <DisplayField
               label="賣出價 (Sell)"
               bind:value={sellPrice}
-              active={activeInput === 'sell'}
-              onClick={() => (activeInput = 'sell')}
+              onFocus={() => (activeInput = 'sell')}
+              onBlur={() => (activeInput = null)}
             />
           </div>
         {/if}
@@ -264,8 +264,8 @@
             <DisplayField
               label="基準價 (Base Price)"
               bind:value={basePrice}
-              active={activeInput === 'base'}
-              onClick={() => (activeInput = 'base')}
+              onFocus={() => (activeInput = 'base')}
+              onBlur={() => (activeInput = null)}
             />
           </div>
         {/if}
@@ -274,8 +274,8 @@
           <DisplayField
             label="交易張數 (Qty)"
             bind:value={quantity}
-            active={activeInput === 'quantity'}
-            onClick={() => (activeInput = 'quantity')}
+            onFocus={() => (activeInput = 'quantity')}
+            onBlur={() => (activeInput = null)}
           />
           <!-- 快速張數選擇器 -->
           <div class="flex items-center gap-2">

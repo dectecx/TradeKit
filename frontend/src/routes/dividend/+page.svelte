@@ -22,11 +22,7 @@
   // Determine which formulas to show
   let showFormulas = $derived(price > 0 && (cashDiv > 0 || stockDiv > 0));
 
-  // Component logic
-  function handleInputFocus(field: 'price' | 'cash' | 'stock') {
-    activeInput = field;
-  }
-
+  // Component logic (activeInput is only needed for mobile Numpad)
   function handleInput(value: string) {
     if (activeInput === 'price') priceStr = value;
     if (activeInput === 'cash') cashDivStr = value;
@@ -56,20 +52,20 @@
         <DisplayField
           label="除權息前股價"
           bind:value={priceStr}
-          active={activeInput === 'price'}
-          onClick={() => handleInputFocus('price')}
+          onFocus={() => (activeInput = 'price')}
+          onBlur={() => (activeInput = null)}
         />
         <DisplayField
           label="現金股利 (配息)"
           bind:value={cashDivStr}
-          active={activeInput === 'cash'}
-          onClick={() => handleInputFocus('cash')}
+          onFocus={() => (activeInput = 'cash')}
+          onBlur={() => (activeInput = null)}
         />
         <DisplayField
           label="股票股利 (配股)"
           bind:value={stockDivStr}
-          active={activeInput === 'stock'}
-          onClick={() => handleInputFocus('stock')}
+          onFocus={() => (activeInput = 'stock')}
+          onBlur={() => (activeInput = null)}
         />
       </div>
     </div>
