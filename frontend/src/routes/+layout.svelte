@@ -6,11 +6,16 @@
   import { settings } from '$lib/stores/settings.svelte';
   import '../app.css';
 
+  import { page } from '$app/stores';
+
   let { children } = $props();
 
   // Layout states
   let isSettingsOpen = $state(false);
   let isMobileMenuOpen = $state(false);
+
+  // Dynamic Header Title
+  let pageTitle = $derived($page.url.pathname.includes('/dividend') ? '除權息參考價計算機' : '台股 / 當沖計算機');
 </script>
 
 <svelte:head>
@@ -31,7 +36,7 @@
 
     <!-- Main Content Area Wrapper -->
     <div class="relative flex min-h-screen flex-1 flex-col">
-      <Header title="台股 / 當沖計算機" onOpenSettings={() => (isSettingsOpen = true)} bind:isMobileMenuOpen />
+      <Header title={pageTitle} onOpenSettings={() => (isSettingsOpen = true)} bind:isMobileMenuOpen />
 
       <main class="mx-auto flex w-full max-w-lg flex-1 flex-col p-4 md:max-w-3xl lg:max-w-5xl lg:p-8">
         <!-- 路由注入區 -->

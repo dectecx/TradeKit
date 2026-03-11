@@ -234,3 +234,68 @@ export function generateTickLadder(
 
   return ladder;
 }
+
+/**
+ * 計算除權息殖利率 (Cash Yield, Stock Yield, Total Yield)
+ * @param price 除權息前股價
+ * @param cashDividend 現金股利 (元)
+ * @param stockDividend 股票股利 (元)
+ * @returns { cashYield: number, stockYield: number, totalYield: number }
+ */
+export function calculateDividendYields(
+  price: number,
+  cashDividend: number,
+  stockDividend: number
+): { cashYield: number; stockYield: number; totalYield: number } {
+  if (price <= 0) {
+    return { cashYield: 0, stockYield: 0, totalYield: 0 };
+  }
+
+  const priceDec = new Decimal(price);
+  const cashDivDec = new Decimal(cashDividend);
+  const stockDivDec = new Decimal(stockDividend);
+
+  // 現金殖利率 = (現金股利 / 股價) * 100%
+  const cashYield = cashDivDec.dividedBy(priceDec).times(100).toDecimalPlaces(2).toNumber();
+
+  // 股票股利殖利率 (台股) = (股票股利 / 股票發行面額(通常為10)) * 100%
+  const stockYield = stockDivDec.dividedBy(10).times(100).toDecimalPlaces(2).toNumber();
+
+  // 總殖利率
+  const totalYield = new Decimal(cashYield).plus(stockYield).toNumber();
+
+  return {
+    cashYield,
+    stockYield,
+    totalYield,
+  };
+}
+
+/**
+ * 計算除權息後參考價
+ * 台股公式：同時除權除息 -> 先除息再除權
+ * @param price 除權息前股價
+ * @param cashDividend 現金股利 (元)
+ * @param stockDividend 股票股利 (元)
+ * @returns 除權息後參考價
+ */
+export function getExDividendPrice(price: number, cashDividend: number, stockDividend: number): number {
+  if (price <= 0) return 0;
+
+  const priceDec = new Decimal(price);
+  const cashDivDec = new Decimal(cashDividend);
+  const stockDivDec = new Decimal(stockDividend);
+
+  // 1. 先除息 (Price - Cash Div)
+  const afterCashDivPrice = priceDec.minus(cashDivDec);
+
+  // 2. 再除權 (AfterCashDivPrice / (1 + (Stock Div / 10)))
+  // 股票面額為 10
+  const stockDivRatio = stockDivDec.dividedBy(10);
+  const divisor = new Decimal(1).plus(stockDivRatio);
+
+  const finalPrice = afterCashDivPrice.dividedBy(divisor);
+
+  // 回傳小數點後四捨五入兩位
+  return finalPrice.toDecimalPlaces(2).toNumber();
+}

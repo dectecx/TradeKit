@@ -7,6 +7,8 @@ import {
   getNextTick,
   getPrevTick,
   generateTickLadder,
+  calculateDividendYields,
+  getExDividendPrice,
 } from './finance';
 
 describe('TradeKit Financial Calculations', () => {
@@ -167,6 +169,71 @@ describe('TradeKit Financial Calculations', () => {
 
       // Profit = 100,809 - 100,039 = 770
       expect(result.profit).toBe(770);
+    });
+  });
+
+  describe('Dividend & Yield Calculations (除權息與殖利率)', () => {
+    describe('calculateDividendYields', () => {
+      it('calculates cash yield correctly', () => {
+        // Price: 100, Cash Div: 5, Stock Div: 0 -> Cash Yield: 5%
+        const yields = calculateDividendYields(100, 5, 0);
+        expect(yields.cashYield).toBe(5);
+        expect(yields.stockYield).toBe(0);
+        expect(yields.totalYield).toBe(5);
+      });
+
+      it('calculates stock yield correctly (based on par value 10)', () => {
+        // Price: 100, Cash Div: 0, Stock Div: 1 -> Stock Yield: (1/10)*100 = 10%
+        const yields = calculateDividendYields(100, 0, 1);
+        expect(yields.cashYield).toBe(0);
+        expect(yields.stockYield).toBe(10);
+        expect(yields.totalYield).toBe(10);
+      });
+
+      it('calculates combined total yield correctly', () => {
+        // Price: 100, Cash Div: 5, Stock Div: 1.2
+        // Cash Yield = 5%
+        // Stock Yield = 12%
+        // Total Yield = 17%
+        const yields = calculateDividendYields(100, 5, 1.2);
+        expect(yields.cashYield).toBe(5);
+        expect(yields.stockYield).toBe(12);
+        expect(yields.totalYield).toBe(17);
+      });
+
+      it('handles zero values cleanly', () => {
+        const yields = calculateDividendYields(100, 0, 0);
+        expect(yields.cashYield).toBe(0);
+        expect(yields.stockYield).toBe(0);
+        expect(yields.totalYield).toBe(0);
+      });
+    });
+
+    describe('getExDividendPrice', () => {
+      it('calculates Ex-Dividend (只除息) correctly', () => {
+        // Price: 100, Cash Div: 5 -> Result: 95
+        expect(getExDividendPrice(100, 5, 0)).toBe(95);
+      });
+
+      it('calculates Ex-Right (只除權) correctly', () => {
+        // Price: 100, Stock Div: 1 -> Result: 100 / (1 + (1/10)) = 100 / 1.1 = 90.9090...
+        // Assuming round to 2 decimal places for standard display or test strictly
+        const price = getExDividendPrice(100, 0, 1);
+        expect(price).toBeCloseTo(90.91, 2);
+      });
+
+      it('calculates simultaneous Ex-Dividend and Ex-Right (同時除權息) correctly', () => {
+        // Formula: 先計算除息再計算除權
+        // Price: 100, Cash Div: 5, Stock Div: 1
+        // Step 1: 100 - 5 = 95
+        // Step 2: 95 / (1 + (1/10)) = 95 / 1.1 = 86.3636...
+        const price = getExDividendPrice(100, 5, 1);
+        expect(price).toBeCloseTo(86.36, 2);
+      });
+
+      it('handles zero divisions gracefully', () => {
+        expect(getExDividendPrice(100, 0, 0)).toBe(100);
+      });
     });
   });
 });

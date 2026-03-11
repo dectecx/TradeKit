@@ -3,12 +3,14 @@
   import { Calculator, ChartLine, History, X } from 'lucide-svelte';
   import { fade } from 'svelte/transition';
 
-  // Navigation Items
-  const navItems = [
-    { name: '台股 / 當沖計算機', icon: Calculator, href: '/', active: true },
-    { name: '除權息試算', icon: ChartLine, href: '#', active: false },
+  import { page } from '$app/stores';
+
+  // Navigation Items (reactively calculated based on current URL)
+  let navItems = $derived([
+    { name: '台股 / 當沖計算機', icon: Calculator, href: '/', active: $page.url.pathname === '/' },
+    { name: '除權息參考價', icon: ChartLine, href: '/dividend', active: $page.url.pathname.startsWith('/dividend') },
     { name: '歷史損益', icon: History, href: '#', active: false },
-  ];
+  ]);
 
   let { isMobileMenuOpen = $bindable(false) }: { isMobileMenuOpen: boolean } = $props();
 
