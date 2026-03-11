@@ -47,8 +47,8 @@ class SettingsStore {
       if (storedIsDarkMode !== null) {
         this.isDarkMode = storedIsDarkMode === 'true';
       } else {
-        // 若未設定過，則依循系統偏好
-        this.isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // 若未設定過，預設為暗黑模式
+        this.isDarkMode = true;
       }
     }
 
