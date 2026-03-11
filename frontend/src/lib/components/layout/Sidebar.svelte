@@ -19,7 +19,7 @@
 
 <!-- Desktop Sidebar (Hidden on Mobile) -->
 <aside
-  class="sticky top-0 hidden h-screen w-64 flex-col border-r border-slate-200 bg-slate-50 lg:flex dark:border-white/10 dark:bg-slate-900"
+  class="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-slate-200 bg-slate-50 lg:flex dark:border-white/10 dark:bg-slate-900"
 >
   <div class="flex h-16 items-center border-b border-slate-200 px-6 dark:border-white/10">
     <div class="flex items-center gap-3">

@@ -24,16 +24,16 @@
 <!-- Theme Wrapper -->
 <div class={settings.isDarkMode ? 'dark' : ''}>
   <div
-    class="flex h-screen w-full overflow-hidden bg-slate-50 font-sans text-slate-900 transition-colors duration-300 selection:bg-sky-500/30 dark:bg-slate-950 dark:text-slate-50"
+    class="flex min-h-screen w-full bg-slate-50 font-sans text-slate-900 transition-colors duration-300 selection:bg-sky-500/30 dark:bg-slate-950 dark:text-slate-50"
   >
     <!-- Sidebar (Desktop and Mobile Wrapper) -->
     <Sidebar bind:isMobileMenuOpen />
 
     <!-- Main Content Area Wrapper -->
-    <div class="relative flex h-screen flex-1 flex-col overflow-hidden">
+    <div class="relative flex min-h-screen flex-1 flex-col">
       <Header title="台股 / 當沖計算機" onOpenSettings={() => (isSettingsOpen = true)} bind:isMobileMenuOpen />
 
-      <main class="mx-auto flex w-full max-w-lg flex-1 flex-col overflow-y-auto p-4 md:max-w-3xl lg:max-w-5xl lg:p-8">
+      <main class="mx-auto flex w-full max-w-lg flex-1 flex-col p-4 md:max-w-3xl lg:max-w-5xl lg:p-8">
         <!-- 路由注入區 -->
         <div class="flex-1">
           {@render children()}
