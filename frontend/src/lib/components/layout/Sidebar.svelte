@@ -47,7 +47,6 @@
       </a>
     {/each}
   </nav>
-
 </aside>
 
 <!-- Mobile Fullscreen Menu -->

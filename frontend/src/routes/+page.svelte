@@ -3,7 +3,7 @@
   import DisplayField from '$lib/components/DisplayField.svelte';
   import { settings } from '$lib/stores/settings.svelte';
   import { calculateTrade, generateTickLadder } from '$lib/utils/finance';
-  import { ArrowRightLeft, ListEnd, TrendingDown, TrendingUp } from 'lucide-svelte';
+  import { ArrowRightLeft, ListEnd, ListPlus, TrendingDown, TrendingUp } from 'lucide-svelte';
   import { fade, slide } from 'svelte/transition';
 
   // ==========================================
@@ -319,7 +319,9 @@
               {/if}
             </span>
           </label>
-          <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+          <span
+            class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+          >
             折數 {settings.discount}
           </span>
         </div>
@@ -440,6 +442,14 @@
           >
             <!-- 表格 Header (Desktop) -->
             <div
+              class="hidden items-center justify-between border-b border-slate-100 px-5 py-3 md:flex dark:border-white/5"
+            >
+              <span class="text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                💡 點擊「目標價位」可直接帶入為新的基準價
+              </span>
+            </div>
+
+            <div
               class="hidden bg-slate-100/50 px-5 py-3 text-xs font-bold tracking-wider text-slate-500 uppercase md:grid md:grid-cols-[1.2fr_1fr_1fr_0.8fr_0.8fr_1.8fr] dark:bg-slate-800/50 dark:text-slate-400"
             >
               <div class="text-left">目標價位</div>
@@ -478,11 +488,24 @@
                   >
                     <!-- 1. 價位 (Price) & Mobile 檔位 -->
                     <div class="text-left md:col-span-1">
-                      <div
-                        class="font-sans text-base font-bold tracking-tight text-slate-800 md:text-lg dark:text-slate-100"
+                      <button
+                        type="button"
+                        onclick={() => {
+                          basePrice = row.price.toFixed(2).replace(/\.?0+$/, '');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        class="group flex cursor-pointer items-center gap-1 rounded-lg transition-colors hover:text-sky-500 dark:hover:text-sky-400"
+                        title="設為新基準價"
                       >
-                        {row.price.toFixed(2).replace(/\.?0+$/, '')}
-                      </div>
+                        <span
+                          class="font-sans text-base font-bold tracking-tight text-slate-800 transition-colors group-hover:text-sky-500 md:text-lg dark:text-slate-100 dark:group-hover:text-sky-400"
+                        >
+                          {row.price.toFixed(2).replace(/\.?0+$/, '')}
+                        </span>
+                        <ListPlus
+                          class="h-4 w-4 text-transparent transition-colors group-hover:text-sky-500/50 dark:group-hover:text-sky-400/50"
+                        />
+                      </button>
                       <!-- Mobile Only: Ticks badge below price -->
                       <div class="mt-0.5 md:hidden">
                         {#if row.ticks > 0}
