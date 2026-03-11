@@ -65,7 +65,7 @@
         {
           label: '複利總額',
           data: data.map((d) => d.compoundTotal),
-          borderColor: '#6366f1', // Indigo
+          borderColor: '#6366f1', // Indigo-500
           backgroundColor: '#6366f120',
           tension: 0.4,
           fill: true,
@@ -75,7 +75,7 @@
         {
           label: '單利總額',
           data: data.map((d) => d.simpleTotal),
-          borderColor: '#10b981', // Emerald
+          borderColor: '#f59e0b', // Amber-500
           backgroundColor: 'transparent',
           borderDash: [5, 5],
           tension: 0,
@@ -84,7 +84,7 @@
         {
           label: '投入本金',
           data: data.map((d) => d.principal),
-          borderColor: '#f59e0b', // Amber
+          borderColor: '#94a3b8', // Slate-400
           backgroundColor: 'transparent',
           tension: 0,
           pointRadius: 0,
@@ -162,132 +162,149 @@
   }
 </script>
 
-<div class="flex w-full flex-col gap-6" in:fade>
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
-    <!-- Left Column: Inputs & Summary -->
-    <div class="flex flex-col gap-6 lg:col-span-4">
-      <!-- Input Card -->
+<div class="flex w-full flex-col gap-5" in:fade>
+  <!-- Top Section: Inputs & Summary -->
+  <div class="grid grid-cols-1 gap-5 lg:grid-cols-12">
+    <!-- Calculator Inputs -->
+    <div class="lg:col-span-4">
       <div
-        class="rounded-3xl border border-slate-200/50 bg-white/80 p-6 shadow-xl shadow-slate-200/20 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 dark:shadow-none"
+        class="h-full rounded-2xl border border-slate-200/50 bg-white/80 p-5 shadow-xl shadow-slate-200/20 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 dark:shadow-none"
       >
-        <div class="mb-6 flex items-center gap-3">
-          <div
-            class="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400"
-          >
-            <Calculator class="h-6 w-6" />
+        <div class="mb-5 flex items-center gap-3">
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400">
+            <Calculator class="h-5 w-5" />
           </div>
-          <h2 class="text-xl font-bold text-slate-800 dark:text-white">計算參數</h2>
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white">計算參數</h2>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-3">
           <DisplayField label="本金 (投資金額初值)" bind:value={initialAmount} />
           <DisplayField label="每月投入金額 (定期定額)" bind:value={monthlyContribution} />
           <DisplayField label="年利率 (%)" bind:value={annualRate} />
           <DisplayField label="年期 (年)" bind:value={years} />
         </div>
       </div>
-
-      <!-- Result Scorecard - Taiwan Style (Red for Profit) -->
-      <div
-        class="rounded-3xl border border-slate-200/50 bg-white/80 p-6 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80"
-      >
-        <h3 class="mb-4 font-bold text-slate-800 dark:text-white">
-          最終結果 ({mode === 'compound' ? '複利' : '單利'})
-        </h3>
-
-        <div class="space-y-4">
-          <div>
-            <div class="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">總金額</div>
-            <div class="text-3xl font-black tracking-tight text-rose-500">
-              {formatCurrency(mode === 'compound' ? results.summary.compound.total : results.summary.simple.total)}
-              <span class="text-sm font-normal text-slate-400">元</span>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4 dark:border-white/5">
-            <div>
-              <div class="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">累計本金</div>
-              <div class="text-lg font-bold text-slate-800 dark:text-white">
-                {formatCurrency(results.summary.principal)}
-              </div>
-            </div>
-            <div>
-              <div class="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">投資報酬率</div>
-              <div class="text-lg font-bold text-rose-500">
-                {formatPercent(mode === 'compound' ? results.summary.compound.roi : results.summary.simple.roi)}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Right Column: Visualization -->
-    <div class="flex flex-col gap-6 lg:col-span-8">
-      <!-- Chart Card -->
-      <div
-        class="flex flex-1 flex-col rounded-3xl border border-slate-200/50 bg-white/80 p-6 shadow-xl shadow-slate-200/20 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 dark:shadow-none"
-      >
-        <div class="mb-6 flex items-center justify-between">
-          <h2 class="text-xl font-bold text-slate-800 dark:text-white">成長趨勢比較</h2>
-          <div class="flex gap-2 rounded-xl bg-slate-100/50 p-1 dark:bg-slate-800/50">
-            <button
-              onclick={() => (mode = 'compound')}
-              class="rounded-lg px-3 py-1 text-xs font-bold transition-all {mode === 'compound'
-                ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-700 dark:text-sky-400'
-                : 'text-slate-500'}">複利</button
-            >
-            <button
-              onclick={() => (mode = 'simple')}
-              class="rounded-lg px-3 py-1 text-xs font-bold transition-all {mode === 'simple'
-                ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-700 dark:text-sky-400'
-                : 'text-slate-500'}">單利</button
-            >
+    <!-- Summary, Comparison & Chart View -->
+    <div class="flex flex-col gap-5 lg:col-span-8">
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <!-- Main Result Scorecard -->
+        <div
+          class="rounded-2xl border border-slate-200/50 bg-white/80 p-5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80"
+        >
+          <div class="mb-4 flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400">
+              最終概況 <span class={mode === 'compound' ? 'text-indigo-500' : 'text-amber-500'}
+                >({mode === 'compound' ? '複利' : '單利'})</span
+              >
+            </h3>
+            <div class="flex gap-1 rounded-lg bg-slate-100/50 p-0.5 dark:bg-slate-800/50">
+              <button
+                onclick={() => (mode = 'compound')}
+                class="rounded-md px-2 py-0.5 text-[10px] font-bold transition-all {mode === 'compound'
+                  ? 'bg-indigo-500 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}">複利</button
+              >
+              <button
+                onclick={() => (mode = 'simple')}
+                class="rounded-md px-2 py-0.5 text-[10px] font-bold transition-all {mode === 'simple'
+                  ? 'bg-amber-500 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}">單利</button
+              >
+            </div>
+          </div>
+
+          <div class="space-y-5">
+            <div>
+              <div class="mb-0.5 text-[10px] font-medium text-slate-400">預期總金額</div>
+              <div
+                class="text-2xl font-black tracking-tight {mode === 'compound' ? 'text-indigo-500' : 'text-amber-500'}"
+              >
+                {formatCurrency(mode === 'compound' ? results.summary.compound.total : results.summary.simple.total)}
+                <span class="text-xs font-normal text-slate-400">元</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-3 dark:border-white/5">
+              <div>
+                <div class="mb-0.5 text-[10px] font-medium text-slate-400">累計本金</div>
+                <div class="text-base font-bold text-slate-800 dark:text-white">
+                  {formatCurrency(results.summary.principal)}
+                </div>
+              </div>
+              <div>
+                <div class="mb-0.5 text-[10px] font-medium text-slate-400">總報酬率</div>
+                <div class="text-base font-bold text-rose-500">
+                  {formatPercent(mode === 'compound' ? results.summary.compound.roi : results.summary.simple.roi)}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="relative min-h-[300px] w-full flex-1">
-          <canvas bind:this={chartCanvas}></canvas>
+        <!-- Comparison Mini Table -->
+        <div
+          class="overflow-hidden rounded-2xl border border-slate-200/50 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80"
+        >
+          <div class="overflow-x-auto">
+            <table class="w-full text-center text-xs">
+              <thead>
+                <tr
+                  class="bg-slate-50/50 text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:bg-slate-800/30"
+                >
+                  <th class="px-4 py-3 text-left">比較類型</th>
+                  <th class="px-4 py-3">預期總額</th>
+                  <th class="px-4 py-3 text-right">報酬率</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-white/5">
+                <tr class="transition-colors hover:bg-slate-50/30 dark:hover:bg-white/2">
+                  <td class="px-4 py-3 text-left font-bold text-indigo-500">複利</td>
+                  <td class="px-4 py-3 font-bold text-indigo-500">{formatCurrency(results.summary.compound.total)}</td>
+                  <td class="px-4 py-3 text-right font-bold text-rose-500"
+                    >{formatPercent(results.summary.compound.roi)}</td
+                  >
+                </tr>
+                <tr class="transition-colors hover:bg-slate-50/30 dark:hover:bg-white/2">
+                  <td class="px-4 py-3 text-left font-bold text-amber-500">單利</td>
+                  <td class="px-4 py-3 font-bold text-amber-500">{formatCurrency(results.summary.simple.total)}</td>
+                  <td class="px-4 py-3 text-right font-bold text-rose-500"
+                    >{formatPercent(results.summary.simple.roi)}</td
+                  >
+                </tr>
+                <tr class="bg-slate-50/20 transition-colors dark:bg-white/2">
+                  <td class="px-4 py-3 text-left font-medium text-slate-500">本金</td>
+                  <td class="px-4 py-3 font-medium text-slate-500">{formatCurrency(results.summary.principal)}</td>
+                  <td class="px-4 py-3 text-right font-medium text-slate-400">0%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- Comparison Summary Table (New per user request) -->
+      <!-- Chart Card (Rectangular Wide Strip) -->
       <div
-        class="overflow-hidden rounded-3xl border border-slate-200/50 bg-white/80 shadow-xl shadow-slate-200/20 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 dark:shadow-none"
+        class="rounded-2xl border border-slate-200/50 bg-white/80 p-4 shadow-xl shadow-slate-200/20 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 dark:shadow-none"
       >
-        <div class="overflow-x-auto">
-          <table class="w-full text-center">
-            <thead>
-              <tr class="bg-slate-50/50 text-xs font-bold tracking-wider text-slate-400 uppercase dark:bg-slate-800/30">
-                <th class="px-6 py-4 text-left">類型</th>
-                <th class="px-6 py-4">累積本金</th>
-                <th class="px-6 py-4">預期總金額</th>
-                <th class="px-6 py-4">總報酬率</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-white/5">
-              <tr class="transition-colors hover:bg-slate-50/30 dark:hover:bg-white/2">
-                <td class="px-6 py-4 text-left font-bold text-indigo-500">複利</td>
-                <td class="px-6 py-4 font-medium text-slate-600 dark:text-slate-400"
-                  >{formatCurrency(results.summary.principal)}</td
-                >
-                <td class="px-6 py-4 font-black text-rose-500">{formatCurrency(results.summary.compound.total)}</td>
-                <td class="px-6 py-4 font-black text-rose-500">{formatPercent(results.summary.compound.roi)}</td>
-              </tr>
-              <tr class="transition-colors hover:bg-slate-50/30 dark:hover:bg-white/2">
-                <td class="px-6 py-4 text-left font-bold text-emerald-500">單利</td>
-                <td class="px-6 py-4 font-medium text-slate-600 dark:text-slate-400"
-                  >{formatCurrency(results.summary.principal)}</td
-                >
-                <td class="px-6 py-4 font-bold text-slate-800 dark:text-white"
-                  >{formatCurrency(results.summary.simple.total)}</td
-                >
-                <td class="px-6 py-4 font-bold text-slate-800 dark:text-white"
-                  >{formatPercent(results.summary.simple.roi)}</td
-                >
-              </tr>
-            </tbody>
-          </table>
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-slate-800 dark:text-white">成長趨勢比較</h2>
+          <div class="flex items-center gap-3 text-[10px] text-slate-400">
+            <div class="flex items-center gap-1">
+              <span class="h-1.5 w-1.5 rounded-full bg-indigo-500"></span> 複利
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span> 單利
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span> 本金
+            </div>
+          </div>
+        </div>
+
+        <div class="relative h-[200px] w-full">
+          <canvas bind:this={chartCanvas}></canvas>
         </div>
       </div>
     </div>
@@ -295,30 +312,30 @@
 
   <!-- Detail Table -->
   <div
-    class="overflow-hidden rounded-3xl border border-slate-200/50 bg-white/80 shadow-xl shadow-slate-200/20 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 dark:shadow-none"
+    class="overflow-hidden rounded-2xl border border-slate-200/50 bg-white/80 shadow-xl shadow-slate-200/20 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 dark:shadow-none"
   >
-    <div class="border-b border-slate-100 p-6 dark:border-white/5">
-      <h3 class="font-bold text-slate-800 dark:text-white">年度詳細數據</h3>
+    <div class="border-b border-slate-100 p-5 dark:border-white/5">
+      <h3 class="text-base font-bold text-slate-800 dark:text-white">年度詳細數據</h3>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-left">
         <thead>
-          <tr class="bg-slate-50/50 text-xs font-bold tracking-wider text-slate-400 uppercase dark:bg-slate-800/30">
-            <th class="px-6 py-4">年度</th>
-            <th class="px-6 py-4">累計本金</th>
-            <th class="px-6 py-4">單利總額</th>
-            <th class="px-6 py-4">複利總額</th>
-            <th class="px-6 py-4 text-right">複利超額獲利</th>
+          <tr class="bg-slate-50/50 text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:bg-slate-800/30">
+            <th class="px-6 py-3">年度</th>
+            <th class="px-6 py-3">累計本金</th>
+            <th class="px-6 py-3">單利總額</th>
+            <th class="px-6 py-3">複利總額</th>
+            <th class="px-6 py-3 text-right">複利超額獲利</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 dark:divide-white/5">
           {#each results.yearData as row (row.year)}
-            <tr class="text-sm transition-colors hover:bg-slate-50/30 dark:hover:bg-white/2">
-              <td class="px-6 py-4 font-medium text-slate-400">第 {row.year} 年</td>
-              <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">{formatCurrency(row.principal)}</td>
-              <td class="px-6 py-4 font-medium text-emerald-500">{formatCurrency(row.simpleTotal)}</td>
-              <td class="px-6 py-4 font-black text-rose-500">{formatCurrency(row.compoundTotal)}</td>
-              <td class="px-6 py-4 text-right font-medium {row.excess >= 0 ? 'text-rose-500' : 'text-emerald-500'}">
+            <tr class="text-xs transition-colors hover:bg-slate-50/30 dark:hover:bg-white/2">
+              <td class="px-6 py-3 font-medium text-slate-400">第 {row.year} 年</td>
+              <td class="px-6 py-3 font-medium text-slate-700 dark:text-slate-300">{formatCurrency(row.principal)}</td>
+              <td class="px-6 py-3 font-medium text-amber-500">{formatCurrency(row.simpleTotal)}</td>
+              <td class="px-6 py-3 font-black text-indigo-500">{formatCurrency(row.compoundTotal)}</td>
+              <td class="px-6 py-3 text-right font-medium {row.excess >= 0 ? 'text-rose-500' : 'text-emerald-500'}">
                 {row.excess >= 0 ? '+' : ''}{formatCurrency(row.excess)}
               </td>
             </tr>

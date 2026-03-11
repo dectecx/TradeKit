@@ -326,13 +326,13 @@ export function calculateInterestGrowth(
   let accumulatedInterest = new Decimal(0);
 
   const yearData = [];
-  
+
   // Year 0
   yearData.push({
     year: 0,
     principal: P.toNumber(),
     total: P.toNumber(),
-    interest: 0
+    interest: 0,
   });
 
   for (let y = 1; y <= years; y++) {
@@ -353,12 +353,12 @@ export function calculateInterestGrowth(
         currentTotal = currentPrincipal.plus(accumulatedInterest);
       }
     }
-    
+
     yearData.push({
       year: y,
       principal: currentPrincipal.round().toNumber(),
       total: currentTotal.round().toNumber(),
-      interest: accumulatedInterest.round().toNumber()
+      interest: accumulatedInterest.round().toNumber(),
     });
   }
 
@@ -368,8 +368,7 @@ export function calculateInterestGrowth(
       principal: currentPrincipal.round().toNumber(),
       total: currentTotal.round().toNumber(),
       interest: accumulatedInterest.round().toNumber(),
-      roi: accumulatedInterest.dividedBy(currentPrincipal).times(100).toNumber()
-    }
+      roi: accumulatedInterest.dividedBy(currentPrincipal).times(100).toNumber(),
+    },
   };
 }
-
