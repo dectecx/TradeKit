@@ -15,7 +15,7 @@
   // Dynamic Header Title
   let pageTitle = $derived(
     $page.url.pathname.includes('/dividend')
-      ? '除權息參考價計算機'
+      ? '除權息計算機'
       : $page.url.pathname.includes('/interest')
         ? '單 / 複利計算機'
         : '台股 / 當沖計算機'

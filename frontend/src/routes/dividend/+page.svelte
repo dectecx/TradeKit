@@ -35,7 +35,7 @@
 </script>
 
 <svelte:head>
-  <title>除權息參考價計算機 - TradeKit</title>
+  <title>除權息計算機 - TradeKit</title>
 </svelte:head>
 
 <div class="flex min-h-[calc(100vh-8rem)] flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
