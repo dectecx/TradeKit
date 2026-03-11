@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { settings } from '$lib/stores/settings.svelte';
   import { Calculator, ChartLine, History, X } from 'lucide-svelte';
   import { fade } from 'svelte/transition';
 
@@ -49,14 +48,6 @@
     {/each}
   </nav>
 
-  <div class="border-t border-slate-200 p-4 dark:border-white/10">
-    <div class="rounded-xl bg-slate-100 p-4 dark:bg-slate-800/50">
-      <p class="text-xs font-medium text-slate-500 dark:text-slate-400">目前折數</p>
-      <p class="mt-0.5 text-lg font-bold text-slate-800 dark:text-white">
-        {settings.discount} <span class="text-sm font-normal text-slate-500">折</span>
-      </p>
-    </div>
-  </div>
 </aside>
 
 <!-- Mobile Fullscreen Menu -->

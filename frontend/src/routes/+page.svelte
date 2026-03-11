@@ -319,6 +319,9 @@
               {/if}
             </span>
           </label>
+          <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+            折數 {settings.discount}
+          </span>
         </div>
       </div>
     </div>
