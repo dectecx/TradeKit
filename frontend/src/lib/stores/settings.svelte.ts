@@ -12,6 +12,22 @@ class SettingsStore {
   isDayTrade = $state<boolean>(true);
   isDarkMode = $state<boolean>(true);
 
+  // 根據設定推導的顯示用折數標籤 (例如：2.8 折, 無折讓, 免手續費)
+  discountLabel = $derived.by(() => {
+    const d = parseFloat(this.discount);
+    if (d === 0) return '免手續費';
+    if (d === 10) return '無折讓';
+    return `${this.discount} 折`;
+  });
+
+  // 根據設定推導的顏色類別
+  discountColorClass = $derived.by(() => {
+    const d = parseFloat(this.discount);
+    if (d === 0) return 'text-sky-500 dark:text-sky-400'; // 免手續費
+    if (d === 10) return 'text-slate-400 dark:text-slate-500'; // 無折讓
+    return 'text-slate-500 dark:text-slate-400'; // 一般折數
+  });
+
   constructor() {
     // 1. 初始化時，若處於瀏覽器環境，則嘗試從 localStorage 讀取舊資料
     if (browser) {

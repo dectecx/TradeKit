@@ -321,22 +321,22 @@
               {/if}
             </span>
           </label>
-          <div class="flex items-center gap-2">
-            <span
-              class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400"
-            >
-              折數 {settings.discount}
-            </span>
-            <button
-              type="button"
-              onclick={() => (isSettingsOpen = true)}
-              class="group flex h-7 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-600 transition-colors hover:border-sky-300 hover:bg-sky-50 hover:text-sky-600 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-sky-500/50 dark:hover:bg-sky-900/30 dark:hover:text-sky-400"
-              aria-label="開啟交易設定"
-            >
-              <Settings class="h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-45" />交易設定
-            </button>
-          </div>
+
+          <!-- 右側顯示當前折數 -->
+          <span class="text-xs font-bold {settings.discountColorClass}">
+            {settings.discountLabel}
+          </span>
         </div>
+
+        <!-- 交易設定按鈕 (卡片底部) -->
+        <button
+          type="button"
+          onclick={() => (isSettingsOpen = true)}
+          class="group flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 py-3 text-sm font-semibold text-slate-500 transition-all hover:border-sky-300 hover:bg-sky-50 hover:text-sky-600 active:scale-[0.98] dark:border-white/10 dark:bg-slate-900/30 dark:text-slate-400 dark:hover:border-sky-500/50 dark:hover:bg-sky-900/20 dark:hover:text-sky-400"
+        >
+          <Settings class="h-4 w-4 transition-transform duration-300 group-hover:rotate-45" />
+          開啟交易設定
+        </button>
       </div>
     </div>
     <!-- ============================================== -->
@@ -416,13 +416,17 @@
             </h3>
             <div class="space-y-3">
               <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-500 dark:text-slate-400">買進手續費 (折數 {settings.discount})</span>
+                <span class="text-sm text-slate-500 dark:text-slate-400"
+                  >買進手續費 (<span class={settings.discountColorClass}>{settings.discountLabel}</span>)</span
+                >
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-200"
                   >{formatMoney(singleTradeResult.buyFee)}</span
                 >
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-500 dark:text-slate-400">賣出手續費 (折數 {settings.discount})</span>
+                <span class="text-sm text-slate-500 dark:text-slate-400"
+                  >賣出手續費 (<span class={settings.discountColorClass}>{settings.discountLabel}</span>)</span
+                >
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-200"
                   >{formatMoney(singleTradeResult.sellFee)}</span
                 >
