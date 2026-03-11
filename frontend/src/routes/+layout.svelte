@@ -23,10 +23,10 @@
 </script>
 
 <svelte:head>
-  <title>台股 / 當沖計算機 - TradeKit 損益推演與手續費精算</title>
+  <title>TradeKit - 台股損益推演與手續費精算工具</title>
   <meta
     name="description"
-    content="專為台灣股市設計的現代化當沖計算機。支援單筆獲利試算與多檔位損益推演，精準扣除券商手續費與證交稅，協助當沖客快速判斷出場點。"
+    content="TradeKit 提供專業的台股當沖試算、複利增長與除權息參考價計算工具。介面現代化、數據精準，是投資人不可或缺的輔助工具。"
   />
 </svelte:head>
 

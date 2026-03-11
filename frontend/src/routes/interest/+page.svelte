@@ -162,6 +162,19 @@
   }
 </script>
 
+<svelte:head>
+  <title>單 / 複利計算機 - TradeKit 投資成長與定期定額試算</title>
+  <meta
+    name="description"
+    content="現代化複利計算機，支援定期定額、單筆投入、年化報酬率試算。視覺化呈現單利與複利成長差異，協助您規劃長期投資目標。"
+  />
+  <meta property="og:title" content="單 / 複利計算機 - TradeKit 投資成長與定期定額試算" />
+  <meta
+    property="og:description"
+    content="現代化複利計算機，支援定期定額、單筆投入、年化報酬率試算。視覺化呈現單利與複利成長差異。"
+  />
+</svelte:head>
+
 <div class="flex w-full flex-col gap-5" in:fade>
   <!-- Top Section: Inputs & Summary -->
   <div class="grid grid-cols-1 gap-5 lg:grid-cols-12">

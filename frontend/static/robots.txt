@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tradekit-tw.netlify.app/sitemap.xml

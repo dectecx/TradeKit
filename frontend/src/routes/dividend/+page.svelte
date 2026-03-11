@@ -35,7 +35,16 @@
 </script>
 
 <svelte:head>
-  <title>除權息計算機 - TradeKit</title>
+  <title>除權息計算機 - TradeKit 配股配息參考價試算</title>
+  <meta
+    name="description"
+    content="輕鬆精算台股除權息後的預估參考價。支援現金股利（配息）與股票股利（配股）合併計算，並提供詳細計算公式與推演過程。"
+  />
+  <meta property="og:title" content="除權息計算機 - TradeKit 配股配息參考價試算" />
+  <meta
+    property="og:description"
+    content="輕鬆精算台股除權息後的預估參考價。支援現金股利（配息）與股票股利（配股）合併計算。"
+  />
 </svelte:head>
 
 <div class="flex min-h-[calc(100vh-8rem)] flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
