@@ -1,9 +1,10 @@
 <script lang="ts">
   import DisplayField from '$lib/components/DisplayField.svelte';
-  import { Calculator, Coins, Landmark, TrendingUp, Wallet } from 'lucide-svelte';
-  import { fade, slide } from 'svelte/transition';
-  import { onMount } from 'svelte';
+  import { calculateInterestGrowth } from '$lib/utils/finance';
   import Chart from 'chart.js/auto';
+  import { Calculator } from 'lucide-svelte';
+  import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
 
   // --- State ---
   let mode = $state<'compound' | 'simple'>('compound');
@@ -17,84 +18,33 @@
   let chartInstance: Chart | null = null;
 
   // --- Calculations ---
-  interface YearResult {
-    year: number;
-    principal: number;
-    simpleTotal: number;
-    compoundTotal: number;
-    simpleInterest: number;
-    compoundInterest: number;
-  }
-
   let results = $derived.by(() => {
-    const P = parseFloat(initialAmount) || 0;
-    const PMT = parseFloat(monthlyContribution) || 0;
+    const p = parseFloat(initialAmount) || 0;
+    const pmt = parseFloat(monthlyContribution) || 0;
     const r = (parseFloat(annualRate) || 0) / 100;
     const t = Math.min(Math.max(parseInt(years) || 1, 1), 50);
 
-    const yearData: YearResult[] = [];
+    const compoundData = calculateInterestGrowth(p, pmt, r, t, 'compound');
+    const simpleData = calculateInterestGrowth(p, pmt, r, t, 'simple');
 
-    // Initial state (Year 0)
-    yearData.push({
-      year: 0,
-      principal: P,
-      simpleTotal: P,
-      compoundTotal: P,
-      simpleInterest: 0,
-      compoundInterest: 0,
+    // Combine for visualization
+    const yearData = compoundData.yearData.map((cd, i) => {
+      const sd = simpleData.yearData[i];
+      return {
+        year: cd.year,
+        principal: cd.principal,
+        compoundTotal: cd.total,
+        simpleTotal: sd.total,
+        excess: cd.total - sd.total,
+      };
     });
-
-    let currentCompoundTotal = P;
-    let currentPrincipal = P;
-    let accumulatedCompoundInterest = 0;
-    let accumulatedSimpleInterest = 0;
-
-    const monthlyRate = r / 12;
-
-    for (let y = 1; y <= t; y++) {
-      // Monthly steps for compound interest
-      for (let m = 1; m <= 12; m++) {
-        // Compound
-        const compoundInterestThisMonth = currentCompoundTotal * monthlyRate;
-        accumulatedCompoundInterest += compoundInterestThisMonth;
-        currentCompoundTotal += compoundInterestThisMonth + PMT;
-
-        // Simple
-        currentPrincipal += PMT;
-        // Simple interest earned on all principal accumulated SO FAR
-        accumulatedSimpleInterest += currentPrincipal * monthlyRate;
-      }
-
-      // Note: Initial P earns simple interest too
-      // Actually, simple interest calculation:
-      // Interest = InitialP * r * y + Sum(PMT * r * remaining_time_in_years)
-      // Standard interpretation of "Simple Interest Investment" with monthly deposits:
-      const yTotalSimpleInterest = P * r * y + PMT * 12 * r * (y - 1 + 5.5 / 12); // Approx for simplicity in display
-
-      yearData.push({
-        year: y,
-        principal: Math.round(currentPrincipal),
-        simpleTotal: Math.round(currentPrincipal + accumulatedSimpleInterest),
-        compoundTotal: Math.round(currentCompoundTotal),
-        simpleInterest: Math.round(accumulatedSimpleInterest),
-        compoundInterest: Math.round(accumulatedCompoundInterest),
-      });
-    }
 
     return {
       yearData,
       summary: {
-        principal: currentPrincipal,
-        simple: {
-          total: currentPrincipal + accumulatedSimpleInterest,
-          interest: accumulatedSimpleInterest,
-          roi: (accumulatedSimpleInterest / currentPrincipal) * 100,
-        },
-        compound: {
-          total: currentCompoundTotal,
-          interest: accumulatedCompoundInterest,
-          roi: (accumulatedCompoundInterest / currentPrincipal) * 100,
-        },
+        principal: compoundData.summary.principal,
+        compound: compoundData.summary,
+        simple: simpleData.summary,
       },
     };
   });
@@ -317,7 +267,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-white/5">
               <tr class="transition-colors hover:bg-slate-50/30 dark:hover:bg-white/2">
-                <td class="px-6 py-4 text-left font-bold text-indigo-500">複利 (Compound)</td>
+                <td class="px-6 py-4 text-left font-bold text-indigo-500">複利</td>
                 <td class="px-6 py-4 font-medium text-slate-600 dark:text-slate-400"
                   >{formatCurrency(results.summary.principal)}</td
                 >
@@ -325,7 +275,7 @@
                 <td class="px-6 py-4 font-black text-rose-500">{formatPercent(results.summary.compound.roi)}</td>
               </tr>
               <tr class="transition-colors hover:bg-slate-50/30 dark:hover:bg-white/2">
-                <td class="px-6 py-4 text-left font-bold text-emerald-500">單利 (Simple)</td>
+                <td class="px-6 py-4 text-left font-bold text-emerald-500">單利</td>
                 <td class="px-6 py-4 font-medium text-slate-600 dark:text-slate-400"
                   >{formatCurrency(results.summary.principal)}</td
                 >
@@ -368,8 +318,8 @@
               <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">{formatCurrency(row.principal)}</td>
               <td class="px-6 py-4 font-medium text-emerald-500">{formatCurrency(row.simpleTotal)}</td>
               <td class="px-6 py-4 font-black text-rose-500">{formatCurrency(row.compoundTotal)}</td>
-              <td class="px-6 py-4 text-right font-medium text-rose-500">
-                +{formatCurrency(row.compoundTotal - row.simpleTotal)}
+              <td class="px-6 py-4 text-right font-medium {row.excess >= 0 ? 'text-rose-500' : 'text-emerald-500'}">
+                {row.excess >= 0 ? '+' : ''}{formatCurrency(row.excess)}
               </td>
             </tr>
           {/each}

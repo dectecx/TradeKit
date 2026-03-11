@@ -299,3 +299,77 @@ export function getExDividendPrice(price: number, cashDividend: number, stockDiv
   // 回傳小數點後四捨五入兩位
   return finalPrice.toDecimalPlaces(2).toNumber();
 }
+
+/**
+ * 計算利息發展明細
+ *
+ * @param initialAmount 初始投入
+ * @param monthlyContribution 每月再投入 (於月初投入)
+ * @param annualRate 年化報酬率 (例：5% = 0.05)
+ * @param years 投資年期
+ * @param mode 'compound' (複利) | 'simple' (單利)
+ */
+export function calculateInterestGrowth(
+  initialAmount: number,
+  monthlyContribution: number,
+  annualRate: number,
+  years: number,
+  mode: 'compound' | 'simple'
+) {
+  const P = new Decimal(initialAmount);
+  const PMT = new Decimal(monthlyContribution);
+  const r = new Decimal(annualRate);
+  const monthlyRate = r.dividedBy(12);
+
+  let currentTotal = P;
+  let currentPrincipal = P;
+  let accumulatedInterest = new Decimal(0);
+
+  const yearData = [];
+  
+  // Year 0
+  yearData.push({
+    year: 0,
+    principal: P.toNumber(),
+    total: P.toNumber(),
+    interest: 0
+  });
+
+  for (let y = 1; y <= years; y++) {
+    for (let m = 1; m <= 12; m++) {
+      if (mode === 'compound') {
+        // 月初投入再計息 (Annuity Due)
+        currentTotal = currentTotal.plus(PMT);
+        currentPrincipal = currentPrincipal.plus(PMT);
+        const interestThisMonth = currentTotal.times(monthlyRate);
+        accumulatedInterest = accumulatedInterest.plus(interestThisMonth);
+        currentTotal = currentTotal.plus(interestThisMonth);
+      } else {
+        // 單利：利息僅按當時本金計算，利息本身不生息
+        currentPrincipal = currentPrincipal.plus(PMT);
+        const interestThisMonth = currentPrincipal.times(monthlyRate);
+        accumulatedInterest = accumulatedInterest.plus(interestThisMonth);
+        // 單利總額 = 累計投入本金 + 累計獲利
+        currentTotal = currentPrincipal.plus(accumulatedInterest);
+      }
+    }
+    
+    yearData.push({
+      year: y,
+      principal: currentPrincipal.round().toNumber(),
+      total: currentTotal.round().toNumber(),
+      interest: accumulatedInterest.round().toNumber()
+    });
+  }
+
+  return {
+    yearData,
+    summary: {
+      principal: currentPrincipal.round().toNumber(),
+      total: currentTotal.round().toNumber(),
+      interest: accumulatedInterest.round().toNumber(),
+      roi: accumulatedInterest.dividedBy(currentPrincipal).times(100).toNumber()
+    }
+  };
+}
+

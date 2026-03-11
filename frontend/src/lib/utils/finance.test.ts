@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+  calculateDividendYields,
   calculateFee,
+  calculateInterestGrowth,
   calculateTax,
   calculateTrade,
-  getTickSize,
+  generateTickLadder,
+  getExDividendPrice,
   getNextTick,
   getPrevTick,
-  generateTickLadder,
-  calculateDividendYields,
-  getExDividendPrice,
+  getTickSize,
 } from './finance';
 
 describe('TradeKit Financial Calculations', () => {
@@ -234,6 +235,42 @@ describe('TradeKit Financial Calculations', () => {
       it('handles zero divisions gracefully', () => {
         expect(getExDividendPrice(100, 0, 0)).toBe(100);
       });
+    });
+  });
+
+  describe('Interest & Growth Calculations (利息計算推演)', () => {
+    const p = 10000;
+    const pmt = 1000;
+    const r = 0.15; // 15%
+
+    it('calculates Simple Interest Growth correctly for 1 year', () => {
+      // Manual verification: (11k + 12k + ... + 22k) * (0.15/12) = 2,475
+      const result = calculateInterestGrowth(p, pmt, r, 1, 'simple');
+      expect(result.summary.principal).toBe(22000);
+      expect(result.summary.interest).toBe(2475);
+      expect(result.summary.total).toBe(24475);
+    });
+
+    it('calculates Compound Interest Growth correctly for 1 year', () => {
+      // Month 1: (10k + 1k) * 1.0125 = 11,137.5
+      const result = calculateInterestGrowth(p, pmt, r, 1, 'compound');
+      expect(result.summary.principal).toBe(22000);
+      // Compound should be > Simple
+      expect(result.summary.total).toBeGreaterThan(24475);
+      expect(result.summary.total).toBe(24629); // (Expected for monthly compound with start-of-month pmt)
+    });
+
+    it('handles zero interest rate correctly', () => {
+      const result = calculateInterestGrowth(p, pmt, 0, 1, 'compound');
+      expect(result.summary.interest).toBe(0);
+      expect(result.summary.total).toBe(22000);
+    });
+
+    it('handles zero monthly contribution correctly', () => {
+      // 10,000 * (1 + 0.15/12)^12 = 11,607.54... round to 11,608
+      const result = calculateInterestGrowth(10000, 0, 0.15, 1, 'compound');
+      expect(result.summary.total).toBe(11608);
+      expect(result.summary.interest).toBe(1608);
     });
   });
 });
