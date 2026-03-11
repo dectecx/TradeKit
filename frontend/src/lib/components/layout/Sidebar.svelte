@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Calculator, ChartLine, History, X } from 'lucide-svelte';
+  import { Calculator, Coins, History, Percent, X } from 'lucide-svelte';
   import { fade } from 'svelte/transition';
 
   import { page } from '$app/stores';
@@ -7,8 +7,8 @@
   // Navigation Items (reactively calculated based on current URL)
   let navItems = $derived([
     { name: '台股 / 當沖計算機', icon: Calculator, href: '/', active: $page.url.pathname === '/' },
-    { name: '除權息計算機', icon: ChartLine, href: '/dividend', active: $page.url.pathname.startsWith('/dividend') },
-    { name: '單 / 複利計算機', icon: ChartLine, href: '/interest', active: $page.url.pathname.startsWith('/interest') },
+    { name: '除權息計算機', icon: Percent, href: '/dividend', active: $page.url.pathname.startsWith('/dividend') },
+    { name: '單 / 複利計算機', icon: Coins, href: '/interest', active: $page.url.pathname.startsWith('/interest') },
     { name: '歷史損益', icon: History, href: '#', active: false },
   ]);
 
