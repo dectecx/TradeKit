@@ -85,7 +85,7 @@
     ? 'border-sky-500 bg-white/90 ring-4 ring-sky-500/20 dark:bg-slate-900/90'
     : 'border-slate-200/50 bg-white/60 hover:border-slate-300 hover:bg-white/80 dark:border-white/10 dark:bg-slate-800/40 dark:hover:border-white/20 dark:hover:bg-slate-800/60'}"
 >
-  <div class="flex w-full flex-col items-start gap-1 pr-12">
+  <div class="flex w-full flex-col items-start gap-1">
     <span
       class="text-sm font-medium transition-colors {isFocused
         ? 'text-sky-600 dark:text-sky-400'
@@ -93,30 +93,34 @@
     >
       {label}
     </span>
-    <input
-      bind:this={inputRef}
-      type="text"
-      inputmode="decimal"
-      value={displayValue}
-      oninput={handleNativeInput}
-      onfocus={handleFocus}
-      onblur={handleBlur}
-      class="w-full bg-transparent text-2xl font-bold tracking-tight text-slate-900 placeholder-slate-300 outline-none dark:text-white dark:placeholder-slate-600"
-      placeholder="0"
-    />
-  </div>
+    <div class="relative flex w-full items-center">
+      <input
+        bind:this={inputRef}
+        type="text"
+        inputmode="decimal"
+        value={displayValue}
+        oninput={handleNativeInput}
+        onfocus={handleFocus}
+        onblur={handleBlur}
+        class="w-full bg-transparent pr-12 text-2xl font-bold tracking-tight text-slate-900 placeholder-slate-300 outline-none dark:text-white dark:placeholder-slate-600"
+        placeholder="0"
+      />
 
-  <!-- 清除按鈕 (X) — 加大點擊區域，垂直置中對齊數字 -->
-  {#if value !== ''}
-    <button
-      type="button"
-      tabindex="-1"
-      onmousedown={(e) => e.preventDefault()}
-      onclick={handleClear}
-      class="absolute top-1/2 right-2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-      aria-label="清除欄位內容"
-    >
-      <X class="h-5 w-5" />
-    </button>
-  {/if}
+      <!-- 清除按鈕 (X) -->
+      {#if value !== ''}
+        <div class="absolute inset-y-0 right-0 flex items-center pr-1">
+          <button
+            type="button"
+            tabindex="-1"
+            onmousedown={(e) => e.preventDefault()}
+            onclick={handleClear}
+            class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+            aria-label="清除欄位內容"
+          >
+            <X class="h-5 w-5" />
+          </button>
+        </div>
+      {/if}
+    </div>
+  </div>
 </div>
