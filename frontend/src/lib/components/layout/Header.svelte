@@ -1,12 +1,9 @@
 <script lang="ts">
   import { settings } from '$lib/stores/settings.svelte';
-  import { Menu, Moon, Settings, Sun } from 'lucide-svelte';
+  import { Menu, Moon, Sun } from 'lucide-svelte';
 
-  let {
-    title = '台股 / 當沖計算機',
-    onOpenSettings,
-    isMobileMenuOpen = $bindable(),
-  }: { title?: string; onOpenSettings: () => void; isMobileMenuOpen: boolean } = $props();
+  let { title = '台股 / 當沖計算機', isMobileMenuOpen = $bindable() }: { title?: string; isMobileMenuOpen: boolean } =
+    $props();
 
   function toggleDarkMode() {
     settings.isDarkMode = !settings.isDarkMode;
@@ -47,15 +44,6 @@
       {:else}
         <Moon class="h-[22px] w-[22px]" />
       {/if}
-    </button>
-
-    <!-- Settings Toggle -->
-    <button
-      onclick={onOpenSettings}
-      class="group rounded-full p-2.5 text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-      aria-label="開啟設定面板"
-    >
-      <Settings class="h-[22px] w-[22px] transition-transform duration-300 group-hover:rotate-45" />
     </button>
   </div>
 </header>

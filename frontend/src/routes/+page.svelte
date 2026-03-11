@@ -1,9 +1,10 @@
 <script lang="ts">
   import CustomNumpad from '$lib/components/CustomNumpad.svelte';
   import DisplayField from '$lib/components/DisplayField.svelte';
+  import SettingsDrawer from '$lib/components/SettingsDrawer.svelte';
   import { settings } from '$lib/stores/settings.svelte';
   import { calculateTrade, generateTickLadder } from '$lib/utils/finance';
-  import { ArrowRightLeft, ListEnd, ListPlus, TrendingDown, TrendingUp } from 'lucide-svelte';
+  import { ArrowRightLeft, ListEnd, ListPlus, TrendingDown, TrendingUp, Settings } from 'lucide-svelte';
   import { fade, slide } from 'svelte/transition';
 
   // ==========================================
@@ -11,6 +12,7 @@
   // ==========================================
   type CalcMode = 'single' | 'ladder';
   let calcMode = $state<CalcMode>('ladder');
+  let isSettingsOpen = $state(false);
 
   // 單點試算模式
   let buyPrice = $state<string>('');
@@ -319,11 +321,21 @@
               {/if}
             </span>
           </label>
-          <span
-            class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400"
-          >
-            折數 {settings.discount}
-          </span>
+          <div class="flex items-center gap-2">
+            <span
+              class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+            >
+              折數 {settings.discount}
+            </span>
+            <button
+              type="button"
+              onclick={() => (isSettingsOpen = true)}
+              class="group flex h-7 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-600 transition-colors hover:border-sky-300 hover:bg-sky-50 hover:text-sky-600 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-sky-500/50 dark:hover:bg-sky-900/30 dark:hover:text-sky-400"
+              aria-label="開啟交易設定"
+            >
+              <Settings class="h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-45" />交易設定
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -635,3 +647,8 @@
     </div>
   {/if}
 </div>
+
+<!-- 全局交易設定面板 (掛載在畫面最上層) -->
+{#if isSettingsOpen}
+  <SettingsDrawer onClose={() => (isSettingsOpen = false)} />
+{/if}

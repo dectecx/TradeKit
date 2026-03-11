@@ -83,7 +83,7 @@
       onclick={handleClose}
       class="rounded-full bg-slate-100/80 px-5 py-2 text-sm font-semibold text-slate-600 backdrop-blur-md transition-colors duration-150 hover:bg-slate-200/80 hover:text-slate-900 active:scale-95 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700/80 dark:hover:text-white"
     >
-      完成
+      關閉
     </button>
   </div>
 

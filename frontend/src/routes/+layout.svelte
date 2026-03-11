@@ -2,7 +2,6 @@
   import Footer from '$lib/components/layout/Footer.svelte';
   import Header from '$lib/components/layout/Header.svelte';
   import Sidebar from '$lib/components/layout/Sidebar.svelte';
-  import SettingsDrawer from '$lib/components/SettingsDrawer.svelte';
   import { settings } from '$lib/stores/settings.svelte';
   import '../app.css';
 
@@ -11,7 +10,6 @@
   let { children } = $props();
 
   // Layout states
-  let isSettingsOpen = $state(false);
   let isMobileMenuOpen = $state(false);
 
   // Dynamic Header Title
@@ -36,7 +34,7 @@
 
     <!-- Main Content Area Wrapper -->
     <div class="relative flex min-h-screen flex-1 flex-col">
-      <Header title={pageTitle} onOpenSettings={() => (isSettingsOpen = true)} bind:isMobileMenuOpen />
+      <Header title={pageTitle} bind:isMobileMenuOpen />
 
       <main class="mx-auto flex w-full max-w-lg flex-1 flex-col p-4 md:max-w-3xl lg:max-w-5xl lg:p-8">
         <!-- 路由注入區 -->
@@ -47,8 +45,4 @@
       </main>
     </div>
   </div>
-
-  {#if isSettingsOpen}
-    <SettingsDrawer onClose={() => (isSettingsOpen = false)} />
-  {/if}
 </div>
