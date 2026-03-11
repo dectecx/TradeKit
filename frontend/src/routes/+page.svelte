@@ -177,7 +177,7 @@
           <button
             type="button"
             onclick={() => (calcMode = 'ladder')}
-            class="flex-1 rounded-xl py-2.5 text-sm font-bold transition-all {calcMode === 'ladder'
+            class="flex-1 cursor-pointer rounded-xl py-2.5 text-sm font-bold transition-all {calcMode === 'ladder'
               ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-800 dark:text-sky-400'
               : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}"
           >
@@ -186,7 +186,7 @@
           <button
             type="button"
             onclick={() => (calcMode = 'single')}
-            class="flex-1 rounded-xl py-2.5 text-sm font-bold transition-all {calcMode === 'single'
+            class="flex-1 cursor-pointer rounded-xl py-2.5 text-sm font-bold transition-all {calcMode === 'single'
               ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-800 dark:text-sky-400'
               : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}"
           >
@@ -240,7 +240,7 @@
               <button
                 type="button"
                 onclick={() => (tradeDirection = 'long')}
-                class="flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all {tradeDirection ===
+                class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all {tradeDirection ===
                 'long'
                   ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
                   : 'text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400'}"
@@ -251,7 +251,7 @@
               <button
                 type="button"
                 onclick={() => (tradeDirection = 'short')}
-                class="flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all {tradeDirection ===
+                class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all {tradeDirection ===
                 'short'
                   ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
                   : 'text-slate-500 hover:text-emerald-500 dark:text-slate-400 dark:hover:text-emerald-400'}"
@@ -286,7 +286,7 @@
                   quantity = num.toString();
                   if (activeInput === 'quantity') activeInput = null;
                 }}
-                class="flex-1 rounded-xl border border-slate-200/50 bg-white/60 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-95 dark:border-white/5 dark:bg-slate-800/40 dark:text-slate-300 dark:hover:text-sky-400"
+                class="flex-1 cursor-pointer rounded-xl border border-slate-200/50 bg-white/60 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-95 dark:border-white/5 dark:bg-slate-800/40 dark:text-slate-300 dark:hover:text-sky-400"
               >
                 {num} 張
               </button>
@@ -310,7 +310,14 @@
 						dark:bg-slate-700 dark:peer-checked:bg-sky-500"
               ></div>
             </div>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">現股當沖 (稅率減半)</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">
+              現股當沖
+              {#if settings.isDayTrade}
+                <span class="font-semibold text-orange-500 dark:text-orange-400">(稅率 0.15%)</span>
+              {:else}
+                <span class="text-slate-400 dark:text-slate-500">(稅率 0.3%)</span>
+              {/if}
+            </span>
           </label>
         </div>
       </div>
