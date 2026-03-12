@@ -12,14 +12,22 @@
   // Layout states
   let isMobileMenuOpen = $state(false);
 
-  // Dynamic Header Title
-  let pageTitle = $derived(
-    $page.url.pathname.includes('/dividend')
-      ? '除權息計算機'
-      : $page.url.pathname.includes('/interest')
-        ? '單 / 複利計算機'
-        : '台股 / 當沖計算機'
-  );
+  // Route to Title Mapping
+  const routeTitles: Record<string, string> = {
+    '/dividend': '除權息計算機',
+    '/interest': '單 / 複利計算機',
+    '/': '台股 / 當沖計算機',
+  };
+
+  let pageTitle = $derived.by(() => {
+    const path = $page.url.pathname;
+    // Find the longest matching prefix (excluding root '/')
+    const match = Object.keys(routeTitles)
+      .filter((route) => route !== '/')
+      .find((route) => path.startsWith(route));
+
+    return match ? routeTitles[match] : routeTitles['/'];
+  });
 </script>
 
 <svelte:head>
