@@ -45,6 +45,21 @@
     property="og:description"
     content="輕鬆精算台股除權息後的預估參考價。支援現金股利（配息）與股票股利（配股）合併計算。"
   />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "TradeKit 除權息計算機",
+      "operatingSystem": "Web",
+      "applicationCategory": "FinanceApplication",
+      "description": "計算台股除權息後的預估參考價，支援配股與配息同時試算。",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "TWD"
+      }
+    }
+  </script>
 </svelte:head>
 
 <div class="flex min-h-[calc(100vh-8rem)] flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">

@@ -171,8 +171,23 @@
   <meta property="og:title" content="單 / 複利計算機 - TradeKit 投資成長與定期定額試算" />
   <meta
     property="og:description"
-    content="現代化複利計算機，支援定期定額、單筆投入、年化報酬率試算。視覺化呈現單利與複利成長差異。"
+    content="現代化複利計算機，支援定期定額、單筆投入、年化報酬率試算時，視覺化呈現單利與複利成長差異。"
   />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "TradeKit 複利計算機",
+      "operatingSystem": "Web",
+      "applicationCategory": "FinanceApplication",
+      "description": "支援定期定額與單筆投入的複利增長試算工具。",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "TWD"
+      }
+    }
+  </script>
 </svelte:head>
 
 <div class="flex w-full flex-col gap-5" in:fade>

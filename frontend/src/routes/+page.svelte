@@ -175,6 +175,21 @@
     property="og:description"
     content="專為台灣股市設計的現代化當沖計算機。支援單筆獲利試算與多檔位損益推演，精準扣除券商手續費與證交稅。"
   />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "TradeKit 台股當沖計算機",
+      "operatingSystem": "Web",
+      "applicationCategory": "FinanceApplication",
+      "description": "專為台灣股市設計的當沖損益推演工具，協助計算手續費與證交稅。",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "TWD"
+      }
+    }
+  </script>
 </svelte:head>
 
 <!-- 全域鍵盤事件攔截器 -->

@@ -28,14 +28,13 @@
 
     return match ? routeTitles[match] : routeTitles['/'];
   });
+
+  let canonicalUrl = $derived(`https://tradekit-tw.netlify.app${$page.url.pathname}`);
 </script>
 
 <svelte:head>
-  <title>TradeKit - 台股損益推演與手續費精算工具</title>
-  <meta
-    name="description"
-    content="TradeKit 提供專業的台股當沖試算、複利增長與除權息參考價計算工具。介面現代化、數據精準，是投資人不可或缺的輔助工具。"
-  />
+  <link rel="canonical" href={canonicalUrl} />
+  <meta property="og:url" content={canonicalUrl} />
 </svelte:head>
 
 <!-- Theme Wrapper -->
