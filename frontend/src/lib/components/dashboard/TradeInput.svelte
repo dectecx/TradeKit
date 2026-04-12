@@ -1,6 +1,7 @@
 <script lang="ts">
   import { calculator } from '$lib/stores/calculator.svelte';
   import { settings } from '$lib/stores/settings.svelte';
+  import { t } from '$lib/i18n/index.svelte';
   import { ArrowRightLeft, TrendingDown, TrendingUp, Hash } from 'lucide-svelte';
   import { cn } from '$lib/utils';
 
@@ -25,7 +26,7 @@
           : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
       )}
     >
-      損益推演
+      {t('trade.ladderMode')}
     </button>
     <button
       onclick={() => (calculator.calcMode = 'single')}
@@ -36,7 +37,7 @@
           : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
       )}
     >
-      單筆試算
+      {t('trade.singleMode')}
     </button>
   </div>
 
@@ -51,7 +52,7 @@
             : "bg-white text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400"
         )}
       >
-        <TrendingUp size={16} /> 做多
+        <TrendingUp size={16} /> {t('trade.long')}
       </button>
       <button
         onclick={() => (calculator.tradeDirection = 'short')}
@@ -62,7 +63,7 @@
             : "bg-white text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400"
         )}
       >
-        <TrendingDown size={16} /> 做空
+        <TrendingDown size={16} /> {t('trade.short')}
       </button>
     </div>
   {/if}
@@ -71,7 +72,7 @@
     {#if calculator.calcMode === 'single'}
       <div class="relative grid grid-cols-2 gap-3">
         <div class="space-y-2">
-          <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">買進價</label>
+        <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{t('trade.buyPrice')}</label>
           <input 
             bind:value={calculator.buyPrice} 
             onfocus={() => onFocusInput('buy')}
@@ -79,7 +80,7 @@
           />
         </div>
         <div class="space-y-2">
-          <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">賣出價</label>
+        <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{t('trade.sellPrice')}</label>
           <input 
             bind:value={calculator.sellPrice} 
             onfocus={() => onFocusInput('sell')}
@@ -95,7 +96,7 @@
       </div>
     {:else}
       <div class="space-y-2">
-        <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">基準價 (Base Price)</label>
+        <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{t('trade.basePrice')}</label>
         <input 
           bind:value={calculator.basePrice} 
           onfocus={() => onFocusInput('base')}
@@ -106,7 +107,7 @@
     {/if}
 
     <div class="space-y-2">
-      <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">交易張數 (Qty)</label>
+      <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{t('trade.quantity')}</label>
       <div class="flex gap-2">
         <input 
           bind:value={calculator.quantity} 
@@ -119,7 +120,7 @@
               onclick={() => (calculator.quantity = n.toString())}
               class="rounded-xl border border-slate-200 bg-white text-xs font-bold hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700"
             >
-              {n}張
+              {n}{t('common.unit')}
             </button>
           {/each}
         </div>
@@ -134,8 +135,8 @@
         <Hash size={20} />
       </div>
       <div>
-        <p class="text-sm font-bold">現股當沖</p>
-        <p class="text-[10px] text-slate-400">{settings.isDayTrade ? '稅率 0.15%' : '稅率 0.3%'}</p>
+        <p class="text-sm font-bold">{t('trade.dayTrade')}</p>
+        <p class="text-[10px] text-slate-400">{settings.isDayTrade ? `${t('trade.taxRate')} 0.15%` : `${t('trade.taxRate')} 0.3%`}</p>
       </div>
     </div>
     <button 

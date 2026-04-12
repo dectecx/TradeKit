@@ -1,5 +1,6 @@
 <script lang="ts">
   import { settings } from '$lib/stores/settings.svelte';
+  import { t } from '$lib/i18n/index.svelte';
   import { Settings, Share2 } from 'lucide-svelte';
 
   let { onOpenSettings, showSettings = false } = $props<{ onOpenSettings: () => void, showSettings?: boolean }>();
@@ -21,14 +22,14 @@
   <div class="flex items-center gap-2">
     {#if showSettings}
       <div class="mr-2 hidden items-end flex-col text-right md:flex">
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">當前設定</span>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{t('nav.settings')}</span>
         <span class="text-xs font-black text-sky-600 dark:text-sky-400">
-          {settings.discount}折 / {settings.minFee}元
+          {settings.discount}{t('settings.discountSuffix')} / {settings.minFee}{t('common.twd')}
         </span>
       </div>
       <button 
         onclick={onOpenSettings}
-        aria-label="打開交易設定"
+        aria-label={t('settings.title')}
         class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-sky-900/30 dark:hover:text-sky-400"
       >
         <Settings size={20} />

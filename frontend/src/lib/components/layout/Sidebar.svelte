@@ -65,13 +65,13 @@
          onclick={() => setLocale('zh-TW')}
          class="flex-1 rounded-xl py-2 text-xs font-bold transition-all {i18n.locale === 'zh-TW' ? 'bg-sky-500 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}"
        >
-         繁體中文
+         {t('common.zhTW')}
        </button>
        <button 
          onclick={() => setLocale('en')}
          class="flex-1 rounded-xl py-2 text-xs font-bold transition-all {i18n.locale === 'en' ? 'bg-sky-500 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}"
        >
-         English
+         {t('common.en')}
        </button>
     </div>
   </div>
@@ -95,14 +95,14 @@
       <button
         onclick={toggleMenu}
         class="-mr-2 p-2 text-slate-500 transition-colors hover:text-slate-700 dark:text-slate-400 dark:hover:text-white"
-        aria-label="關閉選單"
+        aria-label={t('common.closeMenu')}
       >
         <X class="h-6 w-6" />
       </button>
     </div>
 
     <nav class="flex-1 space-y-2 overflow-y-auto px-4 py-6">
-      <p class="mb-2 px-2 text-xs font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">工具清單</p>
+      <p class="mb-2 px-2 text-xs font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">{t('nav.tools')}</p>
       {#each navItems as item}
         <a
           href={item.href}
@@ -131,13 +131,13 @@
            onclick={() => { setLocale('zh-TW'); toggleMenu(); }}
            class="flex-1 rounded-xl py-3 text-sm font-bold transition-all {i18n.locale === 'zh-TW' ? 'bg-sky-500 text-white shadow-lg' : 'text-slate-500'}"
          >
-           繁體中文
+           {t('common.zhTW')}
          </button>
          <button 
            onclick={() => { setLocale('en'); toggleMenu(); }}
            class="flex-1 rounded-xl py-3 text-sm font-bold transition-all {i18n.locale === 'en' ? 'bg-sky-500 text-white shadow-lg' : 'text-slate-500'}"
          >
-           English
+           {t('common.en')}
          </button>
       </div>
     </div>

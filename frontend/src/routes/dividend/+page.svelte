@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { i18n, t } from '$lib/i18n/index.svelte';
   import { dividendStore } from '$lib/stores/dividend.svelte';
   import Header from '$lib/components/dashboard/Header.svelte';
   import StatCard from '$lib/components/dashboard/StatCard.svelte';
@@ -28,7 +29,7 @@
 </script>
 
 <svelte:head>
-  <title>TradeKit - 除權息計算</title>
+  <title>TradeKit - {t('dividend.title')}</title>
 </svelte:head>
 
 <div class="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-10">
@@ -41,9 +42,9 @@
       {#if dividendStore.exDivPrice > 0}
         <div in:slide>
           <StatCard 
-            title="除權息後參考價" 
+            title={t('dividend.exPrice')} 
             value={dividendStore.exDivPrice.toString()} 
-            subValue={`原始股價: ${dividendStore.priceStr}`}
+            subValue={`${t('dividend.originPrice')}: ${dividendStore.priceStr}`}
             trend={0} 
             class="from-sky-500 to-sky-600 shadow-sky-500/20"
           />
@@ -51,7 +52,7 @@
       {/if}
 
       <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
-        <h3 class="mb-4 text-xs font-bold tracking-widest text-slate-400 uppercase">範疇輸入</h3>
+        <h3 class="mb-4 text-xs font-bold tracking-widest text-slate-400 uppercase">{t('dividend.inputTitle')}</h3>
         <DividendInput onFocusInput={(f) => activeInput = f} />
       </div>
     </div>
@@ -63,13 +64,13 @@
           <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
             <div class="mb-6 flex items-center gap-2">
               <Calculator size={18} class="text-sky-500" />
-              <h3 class="text-xs font-bold tracking-widest text-slate-400 uppercase">計算過程推演</h3>
+              <h3 class="text-xs font-bold tracking-widest text-slate-400 uppercase">{t('dividend.process')}</h3>
             </div>
 
             {#if dividendStore.stockDiv > 0 && dividendStore.cashDiv > 0}
               <div class="space-y-8">
                 <div>
-                  <p class="mb-3 text-xs font-bold text-slate-400">STEP 1. 除息計算 (扣除現金)</p>
+                  <p class="mb-3 text-xs font-bold text-slate-400">{t('dividend.step1')}</p>
                   <div class="flex items-center gap-4 text-xl font-black md:text-2xl">
                     <span>{dividendStore.price}</span>
                     <span class="text-slate-300">-</span>
@@ -82,7 +83,7 @@
                 <div class="h-px bg-slate-100 dark:bg-slate-800"></div>
 
                 <div>
-                  <p class="mb-3 text-xs font-bold text-slate-400">STEP 2. 除權計算 (股數稀釋)</p>
+                  <p class="mb-3 text-xs font-bold text-slate-400">{t('dividend.step2')}</p>
                   <div class="flex items-center gap-4 text-xl font-black md:text-2xl">
                     <div class="flex flex-col items-center">
                       <span class="border-b-2 border-slate-200 pb-1 px-4 dark:border-slate-700">{Number(new Decimal(dividendStore.price).minus(dividendStore.cashDiv).toDecimalPlaces(4))}</span>
@@ -116,15 +117,15 @@
           <div class="rounded-2xl border border-sky-100 bg-sky-50/50 p-4 text-sm text-sky-700 dark:border-sky-900/30 dark:bg-sky-900/20 dark:text-sky-300">
              <div class="flex items-center gap-2 font-bold mb-1">
                <Info size={14} />
-               <span>台股除權息規則</span>
+               <h3 class="text-xs font-bold tracking-widest uppercase">{t('dividend.ruleTitle')}</h3>
              </div>
-             <p class="opacity-80">除權息參考價計算公式：(除權息前股價 - 現金股利) / (1 + 股票股利 / 10)</p>
+             <p class="opacity-80">{t('dividend.ruleDesc')}</p>
           </div>
         </div>
       {:else}
         <div class="flex flex-col items-center justify-center py-24 text-slate-400">
            <Calculator size={48} class="mb-4 opacity-20" />
-           <p class="font-bold">請輸入股價與股利資訊</p>
+           <p class="font-bold">{t('dividend.empty')}</p>
         </div>
       {/if}
     </div>

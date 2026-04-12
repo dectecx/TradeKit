@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { i18n, t } from '$lib/i18n/index.svelte';
   import { calculator } from '$lib/stores/calculator.svelte';
   import { settings } from '$lib/stores/settings.svelte';
   import { ListPlus, ArrowDown, ArrowUp } from 'lucide-svelte';
@@ -16,17 +17,17 @@
 <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
   <!-- Table Header -->
   <div class="hidden bg-slate-50 px-5 py-4 text-[10px] font-bold tracking-widest text-slate-400 uppercase md:grid md:grid-cols-[1.2fr_1fr_1fr_1.5fr] dark:bg-slate-800/40">
-    <div>目標價位</div>
-    <div class="text-center">漲跌幅</div>
-    <div class="text-center">跳動檔位</div>
-    <div class="text-right">預估損益</div>
+    <div>{t('trade.headerPrice')}</div>
+    <div class="text-center">{t('trade.headerPercent')}</div>
+    <div class="text-center">{t('trade.headerTicks')}</div>
+    <div class="text-right">{t('trade.headerProfit')}</div>
   </div>
 
   <button
     onclick={() => (calculator.ladderRows += 5)}
     class="w-full border-b border-slate-100 bg-white/30 py-3 text-xs font-bold text-slate-400 transition-colors hover:bg-slate-50 hover:text-sky-500 dark:border-slate-800 dark:bg-slate-800/20"
   >
-    + 展開更多高價位檔次
+    {t('trade.ladderHigh')}
   </button>
 
   <div class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -47,9 +48,9 @@
               {row.price.toFixed(2).replace(/\.?0+$/, '')}
             </span>
             {#if row.percentChange >= settings.targetProfitPercent}
-              <span class="rounded bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm ring-1 ring-rose-600/20">停利</span>
+              <span class="rounded bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm ring-1 ring-rose-600/20">{t('trade.tp')}</span>
             {:else if row.percentChange <= settings.stopLossPercent}
-              <span class="rounded bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm ring-1 ring-emerald-600/20">停損</span>
+              <span class="rounded bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm ring-1 ring-emerald-600/20">{t('trade.sl')}</span>
             {/if}
             <ListPlus size={14} class="opacity-0 transition-opacity group-hover:opacity-100" />
           </button>
@@ -59,10 +60,10 @@
                  "rounded-full px-2 py-0.5 text-[9px] font-bold uppercase",
                  row.ticks > 0 ? "bg-rose-100 text-rose-600 dark:bg-rose-900/30" : "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30"
                )}>
-                 {row.ticks > 0 ? '+' : ''}{row.ticks} 檔
+                 {row.ticks > 0 ? '+' : ''}{row.ticks} {t('trade.tickUnit')}
                </span>
              {:else}
-               <span class="rounded-full bg-sky-100 px-2 py-0.5 text-[9px] font-bold text-sky-600 dark:bg-sky-900/30">基準價</span>
+               <span class="rounded-full bg-sky-100 px-2 py-0.5 text-[9px] font-bold text-sky-600 dark:bg-sky-900/30">{t('common.base')}</span>
              {/if}
           </div>
         </div>
@@ -85,7 +86,7 @@
               {row.ticks > 0 ? '+' : ''}{row.ticks}
             </span>
           {:else}
-            <span class="text-[10px] font-bold text-sky-500">BASE</span>
+            <span class="text-[10px] font-bold text-sky-500">{t('common.base').toUpperCase()}</span>
           {/if}
         </div>
 
@@ -103,6 +104,6 @@
     onclick={() => (calculator.ladderRows += 5)}
     class="w-full bg-white/30 py-4 text-xs font-bold text-slate-400 transition-colors hover:bg-slate-50 hover:text-sky-500 dark:bg-slate-800/20"
   >
-    + 展開更多低價位檔次
+    {t('trade.ladderLow')}
   </button>
 </div>

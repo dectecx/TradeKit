@@ -28,7 +28,7 @@ class I18nStore {
   }
 
   // 翻譯函數，支援巢狀 Key (例如: common.name)
-  t(key: string): string {
+  t(key: string, vars: Record<string, any> = {}): string {
     const dict = dictionaries[this.locale];
     const keys = key.split('.');
     let result: any = dict;
@@ -41,9 +41,14 @@ class I18nStore {
       }
     }
 
-    return String(result);
+    let value = String(result);
+    Object.keys(vars).forEach(v => {
+      value = value.replace(`{${v}}`, vars[v]);
+    });
+
+    return value;
   }
 }
 
 export const i18n = new I18nStore();
-export const t = (key: string) => i18n.t(key);
+export const t = (key: string, vars?: Record<string, any>) => i18n.t(key, vars);

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/i18n/index.svelte';
   import { settings } from '$lib/stores/settings.svelte';
   import { settingsSchema } from '$lib/utils/schema';
   import { fade, slide } from 'svelte/transition';
@@ -64,7 +65,7 @@
   in:fade={{ duration: 200 }}
   out:fade={{ duration: 200 }}
   class="fixed inset-0 z-50 h-full w-full cursor-default bg-slate-900/40 backdrop-blur-sm dark:bg-black/80"
-  aria-label="關閉設定面板"
+  aria-label={t('common.close')}
 ></button>
 
 <!-- 從底部滑出的面板 (Mobile) / 側邊面板 (Desktop) -->
@@ -78,18 +79,18 @@
   </div>
 
   <div class="flex items-center justify-between px-6 pb-2">
-    <h2 class="text-xl font-bold tracking-tight text-slate-800 dark:text-white">交易設定</h2>
+    <h2 class="text-xl font-bold tracking-tight text-slate-800 dark:text-white">{t('settings.title')}</h2>
     <button
       onclick={handleClose}
       class="rounded-full bg-slate-100/80 px-5 py-2 text-sm font-semibold text-slate-600 backdrop-blur-md transition-colors duration-150 hover:bg-slate-200/80 hover:text-slate-900 active:scale-95 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700/80 dark:hover:text-white"
     >
-      關閉
+      {t('common.close')}
     </button>
   </div>
 
   <!-- 滾動內容區塊 -->
   <div class="space-y-6 overflow-y-auto px-6 pb-8">
-    <p class="text-sm text-slate-500 dark:text-slate-400">這些設定將會安全地儲存於您的瀏覽器中，每次開啟自動套用。</p>
+    <p class="text-sm text-slate-500 dark:text-slate-400">{t('settings.desc')}</p>
 
     <div class="space-y-4">
       <!-- 券商手續費折數 -->
@@ -100,7 +101,7 @@
             ? 'text-rose-500 dark:text-rose-400'
             : 'text-slate-700 dark:text-slate-300'}"
         >
-          券商手續費折數
+          {t('settings.discount')}
         </label>
         <div class="relative">
           <input
@@ -113,9 +114,9 @@
             class="w-full border bg-slate-50 pr-12 dark:bg-slate-950 {errors.discount
               ? 'border-rose-500 ring-2 ring-rose-500/20'
               : 'focus:ring-primary-500/50 border-slate-200 dark:border-white/10'} [appearance:textfield] rounded-xl px-4 py-3 text-lg font-medium text-slate-900 shadow-inner transition-all outline-none focus:ring-2 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            placeholder="例如：2.8"
+            placeholder={t('settings.discount')}
           />
-          <div class="absolute top-1/2 right-4 -translate-y-1/2 font-medium text-slate-400">折</div>
+          <div class="absolute top-1/2 right-4 -translate-y-1/2 font-medium text-slate-400">{t('settings.discountSuffix')}</div>
         </div>
 
         {#if errors.discount}
@@ -124,7 +125,7 @@
           </p>
         {:else}
           <p class="text-xs text-slate-400 dark:text-slate-500">
-            輸入 0~10。舉例：免手續費為 0，無折讓為 10，2.8 折請輸入 2.8
+            {t('settings.discountHelp')}
           </p>
         {/if}
 
@@ -139,7 +140,7 @@
               }}
               class="flex-1 rounded-xl border border-slate-200/50 bg-white/60 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-95 dark:border-white/5 dark:bg-slate-800/40 dark:text-slate-300 dark:hover:text-sky-400"
             >
-              {num === 0 ? '免手續' : num === 10 ? '無折讓' : num + ' 折'}
+              {num === 0 ? t('settings.free') : num === 10 ? t('settings.noDiscount') : num + ' ' + t('settings.discountSuffix')}
             </button>
           {/each}
         </div>
@@ -153,7 +154,7 @@
             ? 'text-rose-500 dark:text-rose-400'
             : 'text-slate-700 dark:text-slate-300'}"
         >
-          單筆最低手續費 (元)
+          {t('settings.minFee')}
         </label>
         <div class="relative">
           <input
@@ -166,9 +167,9 @@
             class="w-full border bg-slate-50 pr-16 dark:bg-slate-950 {errors.minFee
               ? 'border-rose-500 ring-2 ring-rose-500/20'
               : 'focus:ring-primary-500/50 border-slate-200 dark:border-white/10'} [appearance:textfield] rounded-xl px-4 py-3 text-lg font-medium text-slate-900 shadow-inner transition-all outline-none focus:ring-2 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            placeholder="例如：20"
+            placeholder="20"
           />
-          <div class="absolute top-1/2 right-4 -translate-y-1/2 font-medium text-slate-400">TWD</div>
+          <div class="absolute top-1/2 right-4 -translate-y-1/2 font-medium text-slate-400">{t('common.twd')}</div>
         </div>
 
         {#if errors.minFee}
@@ -176,7 +177,7 @@
             {errors.minFee}
           </p>
         {:else}
-          <p class="text-xs text-slate-400 dark:text-slate-500">一般券商為 20 元，大戶方案可能為 1 元。</p>
+            {t('settings.minFeeHelp')}
         {/if}
 
         <!-- 快速低消選擇器 -->
@@ -190,7 +191,7 @@
               }}
               class="flex-1 rounded-xl border border-slate-200/50 bg-white/60 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-95 dark:border-white/5 dark:bg-slate-800/40 dark:text-slate-300 dark:hover:text-sky-400"
             >
-              {num} 元
+              {num} {t('common.twd')}
             </button>
           {/each}
         </div>
@@ -204,7 +205,7 @@
             ? 'text-rose-500 dark:text-rose-400'
             : 'text-slate-700 dark:text-slate-300'}"
         >
-          預設顯示推演檔位
+          {t('settings.ladderRows')}
         </label>
         <div class="relative">
           <input
@@ -217,9 +218,9 @@
             class="w-full border bg-slate-50 pr-16 dark:bg-slate-950 {errors.defaultLadderRows
               ? 'border-rose-500 ring-2 ring-rose-500/20'
               : 'focus:ring-primary-500/50 border-slate-200 dark:border-white/10'} [appearance:textfield] rounded-xl px-4 py-3 text-lg font-medium text-slate-900 shadow-inner transition-all outline-none focus:ring-2 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            placeholder="例如：5"
+            placeholder="5"
           />
-          <div class="absolute top-1/2 right-4 -translate-y-1/2 font-medium text-slate-400">檔</div>
+          <div class="absolute top-1/2 right-4 -translate-y-1/2 font-medium text-slate-400">{t('trade.tickUnit')}</div>
         </div>
 
         {#if errors.defaultLadderRows}
@@ -227,14 +228,14 @@
             {errors.defaultLadderRows}
           </p>
         {:else}
-          <p class="text-xs text-slate-400 dark:text-slate-500">預設為上下各 5 檔。數量過多可能影響算圖效能。</p>
+            {t('settings.ladderRowsHelp')}
         {/if}
       </div>
       <!-- 損益目標預設值 -->
       <div class="grid grid-cols-2 gap-4 pt-2">
         <div class="space-y-2">
           <label for="targetProfit" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-            預設停利目標 (%)
+            {t('settings.tpTarget')}
           </label>
           <div class="relative">
             <input
@@ -249,7 +250,7 @@
         </div>
         <div class="space-y-2">
           <label for="stopLoss" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-            預設停損警示 (%)
+            {t('settings.slTarget')}
           </label>
           <div class="relative">
             <input

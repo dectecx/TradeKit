@@ -1,13 +1,14 @@
 <script lang="ts">
-  import { interestStore } from '$lib/stores/interest.svelte';
   import Header from '$lib/components/dashboard/Header.svelte';
-  import StatCard from '$lib/components/dashboard/StatCard.svelte';
   import InterestInput from '$lib/components/dashboard/InterestInput.svelte';
+  import StatCard from '$lib/components/dashboard/StatCard.svelte';
   import SettingsDrawer from '$lib/components/SettingsDrawer.svelte';
+  import { t } from '$lib/i18n/index.svelte';
+  import { interestStore } from '$lib/stores/interest.svelte';
   import Chart from 'chart.js/auto';
+  import { PieChart, Table as TableIcon, TrendingUp } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';
-  import { TrendingUp, PieChart, Table as TableIcon } from 'lucide-svelte';
 
   let isSettingsOpen = $state(false);
   let chartCanvas: HTMLCanvasElement | null = $state(null);
@@ -20,13 +21,13 @@
     if (!ctx) return;
 
     const data = interestStore.result.yearData;
-    const labels = data.map((d: any) => `第 ${d.year} 年`);
+    const labels = data.map((d: any) => t('interest.yearNum', { n: d.year }));
 
     const chartData = {
       labels,
       datasets: [
         {
-          label: '複利總額',
+          label: t('interest.chartTotal'),
           data: data.map((d: any) => d.total),
           borderColor: '#6366f1',
           backgroundColor: '#6366f120',
@@ -35,13 +36,13 @@
           pointRadius: 0,
         },
         {
-          label: '投入本金',
+          label: t('interest.chartPrincipal'),
           data: data.map((d: any) => d.principal),
           borderColor: '#94a3b8',
           backgroundColor: 'transparent',
           tension: 0,
           pointRadius: 0,
-        }
+        },
       ],
     };
 
@@ -63,7 +64,7 @@
               titleFont: { size: 13, weight: 'bold' },
               padding: 12,
               cornerRadius: 12,
-            }
+            },
           },
           interaction: {
             mode: 'index',
@@ -92,7 +93,7 @@
 </script>
 
 <svelte:head>
-  <title>TradeKit - 複利計算</title>
+  <title>TradeKit - {t('interest.title')}</title>
 </svelte:head>
 
 <div class="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-10">
@@ -100,22 +101,23 @@
 
   <main class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
     <!-- Left Column -->
-    <div class="space-y-6 lg:col-span-5 lg:sticky lg:top-8">
-      
+    <div class="space-y-6 lg:sticky lg:top-8 lg:col-span-5">
       {#if interestStore.result}
         <div in:slide>
-          <StatCard 
-            title="預計最終總額" 
-            value={formatMoney(interestStore.result.summary.total)} 
-            subValue={`累計投入本金: ${formatMoney(interestStore.result.summary.principal)}`}
-            trend={interestStore.result.summary.roi} 
+          <StatCard
+            title={t('interest.finalTotal')}
+            value={formatMoney(interestStore.result.summary.total)}
+            subValue={`${t('interest.totalPrincipal')}: ${formatMoney(interestStore.result.summary.principal)}`}
+            trend={interestStore.result.summary.roi}
             class="from-indigo-500 to-indigo-600 shadow-indigo-500/20"
           />
         </div>
       {/if}
 
-      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
-        <h3 class="mb-4 text-xs font-bold tracking-widest text-slate-400 uppercase">投資參數</h3>
+      <div
+        class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/40"
+      >
+        <h3 class="mb-4 text-xs font-bold tracking-widest text-slate-400 uppercase">{t('interest.inputParams')}</h3>
         <InterestInput />
       </div>
     </div>
@@ -125,15 +127,15 @@
       {#if interestStore.result}
         <div in:fade class="space-y-6">
           <!-- Chart Card -->
-          <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
+          <div
+            class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/40"
+          >
             <div class="mb-6 flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <PieChart size={18} class="text-indigo-500" />
-                <h3 class="text-xs font-bold tracking-widest text-slate-400 uppercase">成長趨勢</h3>
+                <h3 class="text-xs font-bold tracking-widest text-slate-400 uppercase">{t('interest.growthTrend')}</h3>
               </div>
-              <div class="text-xs font-black text-rose-500">
-                總報酬率: {interestStore.result.summary.roi.toFixed(1)}%
-              </div>
+              {t('interest.roi')}: {interestStore.result.summary.roi.toFixed(1)}%
             </div>
 
             <div class="h-[220px] w-full">
@@ -142,27 +144,31 @@
           </div>
 
           <!-- Table Card -->
-          <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
-            <div class="bg-slate-50/50 px-6 py-4 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
-               <div class="flex items-center gap-2">
-                 <TableIcon size={18} class="text-slate-400" />
-                 <h3 class="text-xs font-bold tracking-widest text-slate-400 uppercase">年度詳細數據</h3>
-               </div>
+          <div
+            class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/40"
+          >
+            <div class="border-b border-slate-100 bg-slate-50/50 px-6 py-4 dark:border-slate-800 dark:bg-slate-800/40">
+              <div class="flex items-center gap-2">
+                <TableIcon size={18} class="text-slate-400" />
+                <h3 class="text-xs font-bold tracking-widest text-slate-400 uppercase">{t('interest.yearlyTable')}</h3>
+              </div>
             </div>
             <div class="max-h-[400px] overflow-y-auto">
               <table class="w-full text-left text-sm">
                 <thead>
                   <tr class="bg-slate-100/30 text-[10px] font-bold text-slate-400 uppercase dark:bg-slate-800/20">
-                    <th class="px-6 py-3">年度</th>
-                    <th class="px-6 py-3">投入本金</th>
-                    <th class="px-6 py-3 text-right">預估總值</th>
+                    <th class="px-6 py-3">{t('interest.year')}</th>
+                    <th class="px-6 py-3">{t('interest.totalPrincipal')}</th>
+                    <th class="px-6 py-3 text-right">{t('interest.totalValue')}</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                   {#each interestStore.result.yearData as row}
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                      <td class="px-6 py-4 font-bold text-slate-400">第 {row.year} 年</td>
-                      <td class="px-6 py-4 font-medium text-slate-600 dark:text-slate-300">{formatMoney(row.principal)}</td>
+                      <td class="px-6 py-4 font-bold text-slate-400">{t('interest.yearNum', { n: row.year })}</td>
+                      <td class="px-6 py-4 font-medium text-slate-600 dark:text-slate-300"
+                        >{formatMoney(row.principal)}</td
+                      >
                       <td class="px-6 py-4 text-right font-black text-indigo-500">{formatMoney(row.total)}</td>
                     </tr>
                   {/each}
@@ -173,8 +179,8 @@
         </div>
       {:else}
         <div class="flex flex-col items-center justify-center py-24 text-slate-400">
-           <TrendingUp size={48} class="mb-4 opacity-20" />
-           <p class="font-bold">請輸入投資參數以開始試算</p>
+          <TrendingUp size={48} class="mb-4 opacity-20" />
+          <p class="font-bold">{t('interest.empty')}</p>
         </div>
       {/if}
     </div>

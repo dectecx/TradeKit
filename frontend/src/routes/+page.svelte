@@ -93,9 +93,9 @@
       {#if calculator.calcMode === 'single' && calculator.singleResult}
         <div in:slide>
           <StatCard 
-            title="預估淨損益" 
+            title={t('trade.profit')} 
             value={formatMoney(calculator.singleResult.profit)} 
-            subValue={`總成本: ${formatMoney(calculator.singleResult.totalCost)} / 實收: ${formatMoney(calculator.singleResult.netRevenue)}`}
+            subValue={`${t('trade.cost')}: ${formatMoney(calculator.singleResult.totalCost)} / ${t('trade.netRevenue')}: ${formatMoney(calculator.singleResult.netRevenue)}`}
             trend={calculator.singleResult.profit}
           />
         </div>
@@ -118,25 +118,25 @@
         {:else}
            <div class="flex flex-col items-center justify-center py-24 text-slate-400">
              <ListEnd size={48} class="mb-4 opacity-20" />
-             <p class="font-bold">等待基準價輸入...</p>
+             <p class="font-bold">{t('trade.waiting')}</p>
            </div>
         {/if}
       {:else if calculator.calcMode === 'single'}
          {#if calculator.singleResult}
            <div class="space-y-4" in:fade>
               <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
-                <h3 class="mb-6 text-xs font-bold tracking-widest text-slate-400 uppercase">交易成本細項</h3>
+                <h3 class="mb-6 text-xs font-bold tracking-widest text-slate-400 uppercase">{t('trade.details')}</h3>
                 <div class="space-y-4">
                   <div class="flex justify-between border-b border-slate-50 pb-4 dark:border-slate-800">
-                    <span class="text-slate-500">買進手續費</span>
+                    <span class="text-slate-500">{t('trade.buyFee')}</span>
                     <span class="font-black">{formatMoney(calculator.singleResult.buyFee)}</span>
                   </div>
                   <div class="flex justify-between border-b border-slate-50 pb-4 dark:border-slate-800">
-                    <span class="text-slate-500">賣出手續費</span>
+                    <span class="text-slate-500">{t('trade.sellFee')}</span>
                     <span class="font-black">{formatMoney(calculator.singleResult.sellFee)}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-slate-500">證券交易稅</span>
+                    <span class="text-slate-500">{t('trade.sellTax')}</span>
                     <span class="font-black text-sky-500">{formatMoney(calculator.singleResult.sellTax)}</span>
                   </div>
                 </div>
@@ -145,7 +145,7 @@
          {:else}
            <div class="flex flex-col items-center justify-center py-24 text-slate-400">
              <ListEnd size={48} class="mb-4 opacity-20" />
-             <p class="font-bold">請輸入買賣價格進行試算</p>
+             <p class="font-bold">{t('trade.emptySingle')}</p>
            </div>
          {/if}
       {/if}
@@ -156,7 +156,7 @@
 <!-- Overlays -->
 {#if activeInput}
   <button
-    aria-label="關閉輸入面板"
+    aria-label={t('common.close')}
     onclick={() => (activeInput = null)}
     class="fixed inset-0 z-40 bg-black/5 backdrop-blur-sm md:hidden"
   ></button>

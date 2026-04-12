@@ -1,5 +1,6 @@
 <script lang="ts">
   import { dividendStore } from '$lib/stores/dividend.svelte';
+  import { t } from '$lib/i18n/index.svelte';
   import { cn } from '$lib/utils';
 
   let { onFocusInput } = $props<{ onFocusInput: (field: any) => void }>();
@@ -7,7 +8,7 @@
 
 <div class="space-y-5">
   <div class="space-y-2">
-    <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">除權息前股價</label>
+    <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{t('dividend.prePrice')}</label>
     <input 
       bind:value={dividendStore.priceStr} 
       onfocus={() => onFocusInput('price')}
@@ -18,7 +19,7 @@
 
   <div class="grid grid-cols-2 gap-3">
     <div class="space-y-2">
-      <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">現金股利 (配息)</label>
+      <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{t('dividend.cashDiv')}</label>
       <input 
         bind:value={dividendStore.cashDivStr} 
         onfocus={() => onFocusInput('cash')}
@@ -27,7 +28,7 @@
       />
     </div>
     <div class="space-y-2">
-      <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">股票股利 (配股)</label>
+      <label class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{t('dividend.stockDiv')}</label>
       <input 
         bind:value={dividendStore.stockDivStr} 
         onfocus={() => onFocusInput('stock')}
