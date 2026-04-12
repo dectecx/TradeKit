@@ -1,20 +1,21 @@
+import { browser } from '$app/environment';
 import { calculateTrade, generateTickLadder } from '$lib/utils/finance';
 import { settings } from './settings.svelte';
 
-export function createCalculator() {
-  let buyPrice = $state('');
-  let sellPrice = $state('');
-  let basePrice = $state('');
-  let quantity = $state('1');
-  let tradeDirection = $state<'long' | 'short'>('long');
-  let calcMode = $state<'single' | 'ladder'>('ladder');
-  let ladderRows = $state(settings.defaultLadderRows);
+class CalculatorStore {
+  buyPrice = $state('0');
+  sellPrice = $state('0');
+  basePrice = $state('0');
+  quantity = $state('1');
+  tradeDirection = $state<'long' | 'short'>('long');
+  calcMode = $state<'single' | 'ladder'>('ladder');
+  ladderRows = $state(settings.defaultLadderRows);
 
   // Derived results
-  const singleResult = $derived.by(() => {
-    const b = parseFloat(buyPrice);
-    const s = parseFloat(sellPrice);
-    const q = parseInt(quantity);
+  singleResult = $derived.by(() => {
+    const b = parseFloat(this.buyPrice);
+    const s = parseFloat(this.sellPrice);
+    const q = parseInt(this.quantity);
     const d = parseFloat(settings.discount) / 10;
     const m = parseInt(settings.minFee);
 
@@ -23,40 +24,52 @@ export function createCalculator() {
     return calculateTrade(b, s, q, d, m, settings.isDayTrade);
   });
 
-  const ladderResult = $derived.by(() => {
-    const b = parseFloat(basePrice);
-    const q = parseInt(quantity);
+  ladderResult = $derived.by(() => {
+    const b = parseFloat(this.basePrice);
+    const q = parseInt(this.quantity);
     const d = parseFloat(settings.discount) / 10;
     const m = parseInt(settings.minFee);
 
     if (isNaN(b) || b <= 0 || isNaN(q) || q <= 0) return null;
 
-    return generateTickLadder(b, q, d, m, settings.isDayTrade, tradeDirection, ladderRows, ladderRows);
+    return generateTickLadder(b, q, d, m, settings.isDayTrade, this.tradeDirection, this.ladderRows, this.ladderRows);
   });
 
-  return {
-    get buyPrice() { return buyPrice; },
-    set buyPrice(v) { buyPrice = v; },
-    get sellPrice() { return sellPrice; },
-    set sellPrice(v) { sellPrice = v; },
-    get basePrice() { return basePrice; },
-    set basePrice(v) { basePrice = v; },
-    get quantity() { return quantity; },
-    set quantity(v) { quantity = v; },
-    get tradeDirection() { return tradeDirection; },
-    set tradeDirection(v) { tradeDirection = v; },
-    get calcMode() { return calcMode; },
-    set calcMode(v) { calcMode = v; },
-    get ladderRows() { return ladderRows; },
-    set ladderRows(v) { ladderRows = v; },
-    
-    get singleResult() { return singleResult; },
-    get ladderResult() { return ladderResult; },
+  constructor() {
+    if (browser) {
+      const storedBuy = localStorage.getItem('tk_calc_buyPrice');
+      if (storedBuy) this.buyPrice = storedBuy;
 
-    resetLadderRows() {
-      ladderRows = settings.defaultLadderRows;
+      const storedSell = localStorage.getItem('tk_calc_sellPrice');
+      if (storedSell) this.sellPrice = storedSell;
+
+      const storedBase = localStorage.getItem('tk_calc_basePrice');
+      if (storedBase) this.basePrice = storedBase;
+
+      const storedQty = localStorage.getItem('tk_calc_quantity');
+      if (storedQty) this.quantity = storedQty;
+
+      const storedDirection = localStorage.getItem('tk_calc_tradeDirection');
+      if (storedDirection) this.tradeDirection = storedDirection as 'long' | 'short';
+
+      const storedMode = localStorage.getItem('tk_calc_mode');
+      if (storedMode) this.calcMode = storedMode as 'single' | 'ladder';
+
+      // Auto-save effects
+      $effect.root(() => {
+        $effect(() => { localStorage.setItem('tk_calc_buyPrice', this.buyPrice); });
+        $effect(() => { localStorage.setItem('tk_calc_sellPrice', this.sellPrice); });
+        $effect(() => { localStorage.setItem('tk_calc_basePrice', this.basePrice); });
+        $effect(() => { localStorage.setItem('tk_calc_quantity', this.quantity); });
+        $effect(() => { localStorage.setItem('tk_calc_tradeDirection', this.tradeDirection); });
+        $effect(() => { localStorage.setItem('tk_calc_mode', this.calcMode); });
+      });
     }
-  };
+  }
+
+  resetLadderRows() {
+    this.ladderRows = settings.defaultLadderRows;
+  }
 }
 
-export const calculator = createCalculator();
+export const calculator = new CalculatorStore();
