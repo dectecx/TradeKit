@@ -230,6 +230,39 @@
           <p class="text-xs text-slate-400 dark:text-slate-500">預設為上下各 5 檔。數量過多可能影響算圖效能。</p>
         {/if}
       </div>
+      <!-- 損益目標預設值 -->
+      <div class="grid grid-cols-2 gap-4 pt-2">
+        <div class="space-y-2">
+          <label for="targetProfit" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+            預設停利目標 (%)
+          </label>
+          <div class="relative">
+            <input
+              id="targetProfit"
+              type="number"
+              step="0.1"
+              bind:value={settings.targetProfitPercent}
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-lg font-medium text-slate-900 shadow-inner outline-none transition-all focus:ring-2 focus:ring-sky-500/50 dark:border-white/10 dark:bg-slate-950 dark:text-white"
+            />
+            <div class="absolute top-1/2 right-4 -translate-y-1/2 font-medium text-slate-400">%</div>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label for="stopLoss" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+            預設停損警示 (%)
+          </label>
+          <div class="relative">
+            <input
+              id="stopLoss"
+              type="number"
+              step="0.1"
+              bind:value={settings.stopLossPercent}
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-lg font-medium text-slate-900 shadow-inner outline-none transition-all focus:ring-2 focus:ring-rose-500/50 dark:border-white/10 dark:bg-slate-950 dark:text-white"
+            />
+            <div class="absolute top-1/2 right-4 -translate-y-1/2 font-medium text-slate-400">%</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

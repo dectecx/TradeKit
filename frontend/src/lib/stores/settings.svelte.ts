@@ -11,6 +11,8 @@ class SettingsStore {
   defaultLadderRows = $state<number>(5);
   isDayTrade = $state<boolean>(true);
   isDarkMode = $state<boolean>(true);
+  targetProfitPercent = $state<number>(2.0); // 預設 2% 停利
+  stopLossPercent = $state<number>(-2.0);    // 預設 -2% 停損
 
   // 根據設定推導的顯示用折數標籤 (例如：2.8 折, 無折讓, 免手續費)
   discountLabel = $derived.by(() => {
@@ -50,6 +52,12 @@ class SettingsStore {
         // 若未設定過，預設為暗黑模式
         this.isDarkMode = true;
       }
+
+      const storedTargetProfit = localStorage.getItem('tk_targetProfit');
+      if (storedTargetProfit) this.targetProfitPercent = parseFloat(storedTargetProfit);
+
+      const storedStopLoss = localStorage.getItem('tk_stopLoss');
+      if (storedStopLoss) this.stopLossPercent = parseFloat(storedStopLoss);
     }
 
     // 2. 利用出色的 Svelte 5 $effect.root 監聽狀態改變並寫回 localStorage
@@ -80,6 +88,14 @@ class SettingsStore {
           } else {
             document.documentElement.classList.remove('dark');
           }
+        });
+
+        $effect(() => {
+          localStorage.setItem('tk_targetProfit', String(this.targetProfitPercent));
+        });
+
+        $effect(() => {
+          localStorage.setItem('tk_stopLoss', String(this.stopLossPercent));
         });
       });
     }

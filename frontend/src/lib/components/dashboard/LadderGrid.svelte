@@ -46,6 +46,11 @@
             <span class="text-lg font-black tracking-tighter text-slate-800 dark:text-slate-100">
               {row.price.toFixed(2).replace(/\.?0+$/, '')}
             </span>
+            {#if row.percentChange >= settings.targetProfitPercent}
+              <span class="rounded bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm ring-1 ring-rose-600/20">停利</span>
+            {:else if row.percentChange <= settings.stopLossPercent}
+              <span class="rounded bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm ring-1 ring-emerald-600/20">停損</span>
+            {/if}
             <ListPlus size={14} class="opacity-0 transition-opacity group-hover:opacity-100" />
           </button>
           <div class="md:hidden">
