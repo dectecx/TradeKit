@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
-import { zhTW } from './locales/zh-TW';
-import { en } from './locales/en';
+import { zhTW } from '$lib/i18n/locales/zh-TW';
+import { en } from '$lib/i18n/locales/en';
 
 export type Locale = 'zh-TW' | 'en';
 
