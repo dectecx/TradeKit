@@ -1,52 +1,25 @@
 <script lang="ts">
-  import CustomNumpad from '$lib/components/CustomNumpad.svelte';
-  import DisplayField from '$lib/components/DisplayField.svelte';
-  import SettingsDrawer from '$lib/components/SettingsDrawer.svelte';
+  import { calculator } from '$lib/stores/calculator.svelte';
   import { settings } from '$lib/stores/settings.svelte';
-  import { calculateTrade, generateTickLadder } from '$lib/utils/finance';
-  import { ArrowRightLeft, ListEnd, ListPlus, TrendingDown, TrendingUp, Settings } from 'lucide-svelte';
+  import Header from '$lib/components/dashboard/Header.svelte';
+  import StatCard from '$lib/components/dashboard/StatCard.svelte';
+  import TradeInput from '$lib/components/dashboard/TradeInput.svelte';
+  import LadderGrid from '$lib/components/dashboard/LadderGrid.svelte';
+  import CustomNumpad from '$lib/components/CustomNumpad.svelte';
+  import SettingsDrawer from '$lib/components/SettingsDrawer.svelte';
+  import { ListEnd } from 'lucide-svelte';
   import { fade, slide } from 'svelte/transition';
 
-  // ==========================================
-  // 1. Svelte 5 狀態管理 ($state 與全域狀態)
-  // ==========================================
-  type CalcMode = 'single' | 'ladder';
-  let calcMode = $state<CalcMode>('ladder');
   let isSettingsOpen = $state(false);
-
-  // 單點試算模式
-  let buyPrice = $state<string>('');
-  let sellPrice = $state<string>('');
-
-  // 階梯推演模式
-  type TradeDirection = 'long' | 'short';
-  let tradeDirection = $state<TradeDirection>('long');
-  let basePrice = $state<string>(''); // 單點輸入基準價
-
-  // 共用張數
-  let quantity = $state<string>('1');
-
-  // Numpad 焦點追蹤，增加 basePrice
+  
   type InputField = 'buy' | 'sell' | 'quantity' | 'base' | null;
-  let activeInput: InputField = $state<InputField>(null);
+  let activeInput = $state<InputField>(null);
 
-  // 當切換模式時，清空無關的輸入焦點
-  $effect(() => {
-    if (calcMode === 'single' && activeInput === 'base') activeInput = null;
-    if (calcMode === 'ladder' && (activeInput === 'buy' || activeInput === 'sell')) activeInput = null;
-  });
-
-  // ==========================================
-  // 2. 全域鍵盤監聽支援 (Desktop Keyboard)
-  // ==========================================
+  // Keyboard Handlers
   function handleGlobalKeydown(e: KeyboardEvent) {
     if (!activeInput) return;
-
-    // 如果控制權交在原生的 input 手上，不再透過 global 事件重複寫入
     if (document.activeElement?.tagName === 'INPUT') return;
-
     const key = e.key;
-
     if (/^[0-9\.]$/.test(key)) {
       e.preventDefault();
       handleNumpadUpdate(key);
@@ -61,22 +34,16 @@
 
   let currentInputValue = $derived.by(() => {
     switch (activeInput) {
-      case 'buy':
-        return buyPrice;
-      case 'sell':
-        return sellPrice;
-      case 'base':
-        return basePrice;
-      case 'quantity':
-        return quantity;
-      default:
-        return '';
+      case 'buy': return calculator.buyPrice;
+      case 'sell': return calculator.sellPrice;
+      case 'base': return calculator.basePrice;
+      case 'quantity': return calculator.quantity;
+      default: return '';
     }
   });
 
   function handleNumpadUpdate(key: string) {
     let val = currentInputValue;
-
     if (key === 'clear') {
       val = val.slice(0, -1);
     } else if (key === '.' && val.includes('.')) {
@@ -92,68 +59,12 @@
     }
 
     switch (activeInput) {
-      case 'buy':
-        buyPrice = val;
-        break;
-      case 'sell':
-        sellPrice = val;
-        break;
-      case 'base':
-        basePrice = val;
-        break;
-      case 'quantity':
-        quantity = val;
-        break;
+      case 'buy': calculator.buyPrice = val; break;
+      case 'sell': calculator.sellPrice = val; break;
+      case 'base': calculator.basePrice = val; break;
+      case 'quantity': calculator.quantity = val; break;
     }
   }
-
-  // ==========================================
-  // 3. 即時響應式計算 ($derived) 與特效 ($effect)
-  // ==========================================
-
-  // 階梯行數控制
-  let ladderRows = $state<number>(settings.defaultLadderRows);
-
-  // 當使用者重新編輯基準價、方向、或張數時，自動將階梯行數重置為設定檔的預設值
-  // 使用 $derived 計算這些依賴項的簽名，若有變動則觸發重置
-  let ladderDependencies = $derived(
-    `${basePrice}-${quantity}-${tradeDirection}-${settings.isDayTrade}-${settings.defaultLadderRows}`
-  );
-  $effect(() => {
-    // 依賴項變動時，強制將行數歸位，避免舊的展開狀態殘留
-    if (ladderDependencies) {
-      ladderRows = settings.defaultLadderRows;
-    }
-  });
-
-  // 單筆試算結果
-  let singleTradeResult = $derived.by(() => {
-    if (calcMode !== 'single') return null;
-
-    const b = parseFloat(buyPrice);
-    const s = parseFloat(sellPrice);
-    const q = parseInt(quantity);
-    const d = parseFloat(settings.discount) / 10;
-    const m = parseInt(settings.minFee);
-
-    if (isNaN(b) || isNaN(s) || isNaN(q) || b <= 0 || s <= 0 || q <= 0 || isNaN(d) || isNaN(m)) return null;
-
-    return calculateTrade(b, s, q, d, m, settings.isDayTrade);
-  });
-
-  // 階梯試算結果
-  let ladderResult = $derived.by(() => {
-    if (calcMode !== 'ladder') return null;
-
-    const b = parseFloat(basePrice);
-    const q = parseInt(quantity);
-    const d = parseFloat(settings.discount) / 10;
-    const m = parseInt(settings.minFee);
-
-    if (isNaN(b) || b <= 0 || isNaN(q) || q <= 0 || isNaN(d) || isNaN(m)) return null;
-
-    return generateTickLadder(b, q, d, m, settings.isDayTrade, tradeDirection, ladderRows, ladderRows);
-  });
 
   const formatMoney = (num: number) => {
     return new Intl.NumberFormat('zh-TW', {
@@ -165,522 +76,113 @@
 </script>
 
 <svelte:head>
-  <title>台股當沖計算機 - TradeKit 損益推演與手續費精算</title>
-  <meta
-    name="description"
-    content="專為台灣股市設計的現代化當沖計算機。支援單筆獲利試算與多檔位損益推演，精準扣除券商手續費與證交稅，協助當沖客快速判斷出場點。"
-  />
-  <meta property="og:title" content="台股當沖計算機 - TradeKit 損益推演與手續費精算" />
-  <meta
-    property="og:description"
-    content="專為台灣股市設計的現代化當沖計算機。支援單筆獲利試算與多檔位損益推演，精準扣除券商手續費與證交稅。"
-  />
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "TradeKit 台股當沖計算機",
-      "operatingSystem": "Web",
-      "applicationCategory": "FinanceApplication",
-      "description": "專為台灣股市設計的當沖損益推演工具，協助計算手續費與證交稅。",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "TWD"
-      }
-    }
-  </script>
+  <title>TradeKit - 台股儀表板</title>
 </svelte:head>
 
-<!-- 全域鍵盤事件攔截器 -->
 <svelte:window onkeydown={handleGlobalKeydown} />
 
-<div class="relative mx-auto w-full max-w-7xl pb-24 transition-colors duration-300">
-  <div class="lg:grid lg:grid-cols-12 lg:items-start lg:gap-10 xl:gap-16">
-    <!-- ============================================== -->
-    <!-- 左側 (Left Column): Input Section -->
-    <!-- ============================================== -->
-    <div class="col-span-12 mb-8 lg:sticky lg:top-4 lg:col-span-5 lg:mb-0">
-      <div class="relative space-y-4 transition-all {activeInput ? 'z-50' : 'z-10'}">
-        <!-- Mode Switcher (單筆試算 vs 損益推演) -->
-        <div class="flex w-full rounded-2xl bg-white/40 p-1.5 shadow-inner backdrop-blur-md dark:bg-slate-900/40">
-          <button
-            type="button"
-            onclick={() => (calcMode = 'ladder')}
-            class="flex-1 cursor-pointer rounded-xl py-2.5 text-sm font-bold transition-all {calcMode === 'ladder'
-              ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-800 dark:text-sky-400'
-              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}"
-          >
-            損益推演
-          </button>
-          <button
-            type="button"
-            onclick={() => (calcMode = 'single')}
-            class="flex-1 cursor-pointer rounded-xl py-2.5 text-sm font-bold transition-all {calcMode === 'single'
-              ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-800 dark:text-sky-400'
-              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}"
-          >
-            單筆試算
-          </button>
-        </div>
+<div class="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-10">
+  <Header onOpenSettings={() => (isSettingsOpen = true)} />
 
-        <!-- Mode: Single Entry -->
-        {#if calcMode === 'single'}
-          <div class="relative grid grid-cols-2 gap-3" transition:slide={{ duration: 200 }}>
-            <DisplayField
-              label="買進價 (Cost)"
-              bind:value={buyPrice}
-              onFocus={() => (activeInput = 'buy')}
-              onBlur={() => (activeInput = null)}
-            />
-
-            <button
-              type="button"
-              aria-label="交換買賣價"
-              onclick={() => {
-                const temp = buyPrice;
-                buyPrice = sellPrice;
-                sellPrice = temp;
-                if (activeInput === 'buy') activeInput = 'sell';
-                else if (activeInput === 'sell') activeInput = 'buy';
-              }}
-              class="absolute top-1/2 left-1/2 z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full
-              border border-slate-200/50 bg-white/80 text-slate-400 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-90
-                      dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-500 dark:hover:text-sky-400"
-            >
-              <ArrowRightLeft class="h-4 w-4" />
-            </button>
-
-            <DisplayField
-              label="賣出價 (Sell)"
-              bind:value={sellPrice}
-              onFocus={() => (activeInput = 'sell')}
-              onBlur={() => (activeInput = null)}
-            />
-          </div>
-        {/if}
-
-        <!-- Mode: Price Ladder -->
-        {#if calcMode === 'ladder'}
-          <div class="space-y-4" transition:slide={{ duration: 200 }}>
-            <!-- 做多做空切換 -->
-            <div
-              class="flex w-full rounded-2xl border border-slate-200/50 bg-white/60 p-1.5 shadow-sm backdrop-blur-md dark:border-white/5 dark:bg-slate-800/40"
-            >
-              <button
-                type="button"
-                onclick={() => (tradeDirection = 'long')}
-                class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all {tradeDirection ===
-                'long'
-                  ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
-                  : 'text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400'}"
-              >
-                <TrendingUp class="h-4 w-4" />
-                做多 (先買後賣)
-              </button>
-              <button
-                type="button"
-                onclick={() => (tradeDirection = 'short')}
-                class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all {tradeDirection ===
-                'short'
-                  ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
-                  : 'text-slate-500 hover:text-emerald-500 dark:text-slate-400 dark:hover:text-emerald-400'}"
-              >
-                <TrendingDown class="h-4 w-4" />
-                做空 (先賣後買)
-              </button>
-            </div>
-
-            <DisplayField
-              label="基準價 (Base Price)"
-              bind:value={basePrice}
-              onFocus={() => (activeInput = 'base')}
-              onBlur={() => (activeInput = null)}
-            />
-          </div>
-        {/if}
-
-        <div class="space-y-3">
-          <DisplayField
-            label="交易張數 (Qty)"
-            bind:value={quantity}
-            onFocus={() => (activeInput = 'quantity')}
-            onBlur={() => (activeInput = null)}
+  <main class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
+    <!-- Left Column: Inputs & Stats -->
+    <div class="space-y-6 lg:col-span-5 lg:sticky lg:top-8">
+      
+      <!-- Quick Stats Card -->
+      {#if calculator.calcMode === 'single' && calculator.singleResult}
+        <div in:slide>
+          <StatCard 
+            title="預估淨損益" 
+            value={formatMoney(calculator.singleResult.profit)} 
+            subValue={`總成本: ${formatMoney(calculator.singleResult.totalCost)} / 實收: ${formatMoney(calculator.singleResult.netRevenue)}`}
+            trend={calculator.singleResult.profit}
           />
-          <!-- 快速張數選擇器 -->
-          <div class="flex items-center gap-2">
-            {#each [1, 2, 5, 10] as num}
-              <button
-                type="button"
-                onclick={() => {
-                  quantity = num.toString();
-                  if (activeInput === 'quantity') activeInput = null;
-                }}
-                class="flex-1 cursor-pointer rounded-xl border border-slate-200/50 bg-white/60 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-md transition-all hover:border-sky-500/30 hover:text-sky-500 active:scale-95 dark:border-white/5 dark:bg-slate-800/40 dark:text-slate-300 dark:hover:text-sky-400"
-              >
-                {num} 張
-              </button>
-            {/each}
-          </div>
         </div>
-
-        <!-- Switch / Day Trade Toggle -->
-        <div
-          class="flex items-center justify-between rounded-2xl border border-slate-200/50 bg-white/60 p-4
-                shadow-sm backdrop-blur-md transition-colors dark:border-white/5 dark:bg-slate-800/40"
-        >
-          <label class="flex cursor-pointer items-center gap-3">
-            <div class="relative">
-              <input type="checkbox" bind:checked={settings.isDayTrade} class="peer sr-only" />
-              <div
-                class="peer h-6 w-11 rounded-full bg-slate-300 shadow-inner
-						peer-checked:bg-sky-500 peer-focus:outline-none after:absolute after:top-[2px]
-						after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border
-						after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white
-						dark:bg-slate-700 dark:peer-checked:bg-sky-500"
-              ></div>
-            </div>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">
-              現股當沖
-              {#if settings.isDayTrade}
-                <span class="font-semibold text-orange-500 dark:text-orange-400">(稅率 0.15%)</span>
-              {:else}
-                <span class="text-slate-400 dark:text-slate-500">(稅率 0.3%)</span>
-              {/if}
-            </span>
-          </label>
-
-          <!-- 右側顯示當前折數 -->
-          <span class="text-xs font-bold {settings.discountColorClass}">
-            {settings.discountLabel}
-          </span>
+      {:else if calculator.calcMode === 'ladder' && calculator.ladderResult}
+        <!-- In ladder mode, we can show a summary of the base price profit or something else -->
+        {@const baseRow = calculator.ladderResult.find(r => r.ticks === 0)}
+        <div in:slide>
+          <StatCard 
+            title="基準價位損益" 
+            value={baseRow ? formatMoney(baseRow.profit) : '$0'} 
+            subValue={`交易張數: ${calculator.quantity} 張 / 手續費已折讓`}
+            trend={baseRow?.profit || 0}
+          />
         </div>
+      {/if}
 
-        <!-- 交易設定按鈕 (卡片底部) -->
-        <button
-          type="button"
-          onclick={() => (isSettingsOpen = true)}
-          class="group flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 py-3 text-sm font-semibold text-slate-500 transition-all hover:border-sky-300 hover:bg-sky-50 hover:text-sky-600 active:scale-[0.98] dark:border-white/10 dark:bg-slate-900/30 dark:text-slate-400 dark:hover:border-sky-500/50 dark:hover:bg-sky-900/20 dark:hover:text-sky-400"
-        >
-          <Settings class="h-4 w-4 transition-transform duration-300 group-hover:rotate-45" />
-          開啟交易設定
-        </button>
+      <!-- Input Card -->
+      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
+        <TradeInput onFocusInput={(f) => activeInput = f} />
       </div>
+
     </div>
-    <!-- ============================================== -->
 
-    <!-- ============================================== -->
-    <!-- 右側 (Right Column): Results Section -->
-    <!-- ============================================== -->
-    <div class="col-span-12 lg:col-span-7">
-      <!-- 空值預設畫面 (Empty State) -->
-      {#snippet EmptyState(title: string, desc: string)}
-        <div in:fade={{ duration: 300 }} class="flex flex-col items-center justify-center py-12 text-center">
-          <div
-            class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-200/50 text-slate-400 dark:bg-slate-800/50 dark:text-slate-500"
-          >
-            <ListEnd class="h-8 w-8" />
-          </div>
-          <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300">{title}</h3>
-          <p class="mt-2 max-w-[200px] text-sm text-slate-500 dark:text-slate-400">{desc}</p>
-        </div>
-      {/snippet}
-
-      {#if calcMode === 'single' && !singleTradeResult}
-        {@render EmptyState('等待輸入價位', '請在上方輸入買進與賣出價，以進行精確的手續費與損益計算。')}
-      {/if}
-
-      {#if calcMode === 'ladder' && !ladderResult}
-        {@render EmptyState('等待設定基準價', '輸入您的進場價位與張數，系統將自動推演高達 11 檔的報酬率價位表。')}
-      {/if}
-
-      <!-- Single Entry Results Section -->
-      {#if calcMode === 'single' && singleTradeResult}
-        <div in:slide={{ duration: 300 }} class="relative z-0 space-y-4">
-          <!-- (Single Result Block remains unchanged) -->
-          <!-- ... -->
-          <div
-            class="relative overflow-hidden rounded-3xl border border-white/10 p-6 text-white shadow-xl backdrop-blur-xl
-				{singleTradeResult.profit >= 0
-              ? 'bg-gradient-to-br from-rose-500 to-rose-600 shadow-rose-500/20'
-              : 'bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-emerald-500/20'}"
-          >
-            <div class="pointer-events-none absolute -right-4 -bottom-4 opacity-10">
-              {#if singleTradeResult.profit >= 0}
-                <TrendingUp class="h-36 w-36" strokeWidth={3} />
-              {:else}
-                <TrendingDown class="h-36 w-36" strokeWidth={3} />
-              {/if}
-            </div>
-
-            <h2 class="mb-1 text-sm font-medium opacity-90">淨損益 (Net Profit)</h2>
-            <div class="mb-5 font-sans text-[2.75rem] leading-none font-black tracking-tight drop-shadow-sm">
-              {formatMoney(singleTradeResult.profit)}
-            </div>
-
-            <div class="my-4 h-px w-full bg-white/20"></div>
-
-            <div class="grid grid-cols-2 gap-4 text-sm font-medium">
-              <div>
-                <p class="relative z-10 opacity-75">總成本 (Cost)</p>
-                <p class="relative z-10 text-lg font-bold tracking-tight">{formatMoney(singleTradeResult.totalCost)}</p>
-              </div>
-              <div>
-                <p class="relative z-10 opacity-75">實收 (Revenue)</p>
-                <p class="relative z-10 text-lg font-bold tracking-tight">
-                  {formatMoney(singleTradeResult.netRevenue)}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Fees & Taxes Detail Breakdown -->
-          <div
-            class="rounded-2xl border border-slate-200/50 bg-white/60 p-5
-                shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-slate-800/60"
-          >
-            <h3 class="mb-4 text-xs font-bold tracking-wider text-slate-400 uppercase dark:text-slate-300">
-              交易成本明細
-            </h3>
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-500 dark:text-slate-400"
-                  >買進手續費 (<span class={settings.discountColorClass}>{settings.discountLabel}</span>)</span
-                >
-                <span class="text-sm font-semibold text-slate-700 dark:text-slate-200"
-                  >{formatMoney(singleTradeResult.buyFee)}</span
-                >
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-500 dark:text-slate-400"
-                  >賣出手續費 (<span class={settings.discountColorClass}>{settings.discountLabel}</span>)</span
-                >
-                <span class="text-sm font-semibold text-slate-700 dark:text-slate-200"
-                  >{formatMoney(singleTradeResult.sellFee)}</span
-                >
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-500 dark:text-slate-400">
-                  交易稅 (
-                  {#if settings.isDayTrade}
-                    <span class="font-semibold text-orange-500 dark:text-orange-400">當沖 0.15%</span>
-                  {:else}
-                    一般 0.3%
-                  {/if}
-                  )
-                </span>
-                <span class="text-sm font-semibold text-sky-600 dark:text-sky-400"
-                  >{formatMoney(singleTradeResult.sellTax)}</span
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-      {/if}
-
-      <!-- Ladder Mode Results Section -->
-      {#if calcMode === 'ladder' && ladderResult}
-        <div in:slide={{ duration: 300 }} class="relative z-0 space-y-4">
-          <div
-            class="overflow-hidden rounded-3xl border border-slate-200/50 bg-white/60 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/60"
-          >
-            <!-- 表格 Header (Desktop) -->
-            <div
-              class="hidden items-center justify-between border-b border-slate-100 px-5 py-3 md:flex dark:border-white/5"
-            >
-              <span class="text-xs font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                💡 點擊「目標價位」可直接帶入為新的基準價
-              </span>
-            </div>
-
-            <div
-              class="hidden bg-slate-100/50 px-5 py-3 text-xs font-bold tracking-wider text-slate-500 uppercase md:grid md:grid-cols-[1.2fr_1fr_1fr_0.8fr_0.8fr_1.8fr] dark:bg-slate-800/50 dark:text-slate-400"
-            >
-              <div class="text-left">目標價位</div>
-              <div class="text-center">漲跌幅</div>
-              <div class="text-center">跳動檔位</div>
-              <div class="text-center">手續費</div>
-              <div class="text-center">交易稅</div>
-              <div class="text-right">預估損益</div>
-            </div>
-            <!-- 表格 Header (Mobile) -->
-            <div
-              class="grid grid-cols-3 bg-slate-100/50 px-5 py-3 text-[11px] font-bold tracking-wider text-slate-500 md:hidden dark:bg-slate-800/50 dark:text-slate-400"
-            >
-              <div class="text-left">價位 / 檔位</div>
-              <div class="text-center">漲跌 / 稅費</div>
-              <div class="text-right">預估損益</div>
-            </div>
-
-            <!-- 向上展開按鈕 -->
-            <button
-              onclick={() => (ladderRows += 5)}
-              class="w-full border-b border-slate-100 bg-white/30 py-2.5 text-xs font-bold text-slate-400 transition-colors hover:bg-slate-100 hover:text-sky-500 active:bg-slate-200 dark:border-white/5 dark:bg-slate-800/20 dark:hover:bg-slate-800 dark:hover:text-sky-400"
-            >
-              + 展開更多高價位檔次
-            </button>
-
-            <!-- 表格 Body -->
-            <div class="flex flex-col">
-              {#each ladderResult as row}
-                <div
-                  class="flex flex-col border-b border-slate-100 px-5 py-3 transition-colors hover:bg-slate-50/50 dark:border-white/5 dark:hover:bg-slate-800/30
-              {row.ticks === 0 ? 'bg-sky-50/50 dark:bg-sky-900/10' : ''}"
-                >
-                  <div
-                    class="grid grid-cols-3 items-center gap-y-1 md:grid-cols-[1.2fr_1fr_1fr_0.8fr_0.8fr_1.8fr] md:gap-y-0"
-                  >
-                    <!-- 1. 價位 (Price) & Mobile 檔位 -->
-                    <div class="text-left md:col-span-1">
-                      <button
-                        type="button"
-                        onclick={() => {
-                          basePrice = row.price.toFixed(2).replace(/\.?0+$/, '');
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        class="group flex cursor-pointer items-center gap-1 rounded-lg transition-colors hover:text-sky-500 dark:hover:text-sky-400"
-                        title="設為新基準價"
-                      >
-                        <span
-                          class="font-sans text-base font-bold tracking-tight text-slate-800 transition-colors group-hover:text-sky-500 md:text-lg dark:text-slate-100 dark:group-hover:text-sky-400"
-                        >
-                          {row.price.toFixed(2).replace(/\.?0+$/, '')}
-                        </span>
-                        <ListPlus
-                          class="h-4 w-4 text-transparent transition-colors group-hover:text-sky-500/50 dark:group-hover:text-sky-400/50"
-                        />
-                      </button>
-                      <!-- Mobile Only: Ticks badge below price -->
-                      <div class="mt-0.5 md:hidden">
-                        {#if row.ticks > 0}
-                          <span
-                            class="inline-flex items-center justify-center rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-600 dark:bg-rose-500/20 dark:text-rose-400"
-                            >+{row.ticks} 檔</span
-                          >
-                        {:else if row.ticks < 0}
-                          <span
-                            class="inline-flex items-center justify-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-                            >{row.ticks} 檔</span
-                          >
-                        {:else}
-                          <span
-                            class="inline-flex items-center justify-center rounded-sm bg-sky-100 px-1.5 py-0.5 text-[10px] font-bold text-sky-600 dark:bg-sky-500/20 dark:text-sky-400"
-                            >基準價</span
-                          >
-                        {/if}
-                      </div>
-                    </div>
-
-                    <!-- 2. 漲跌幅 (Change %) & Mobile 稅費 -->
-                    <div class="flex flex-col items-center justify-center text-center md:col-span-1">
-                      <div
-                        class="text-sm font-bold {row.percentChange > 0
-                          ? 'text-rose-500 dark:text-rose-400'
-                          : row.percentChange < 0
-                            ? 'text-emerald-500 dark:text-emerald-400'
-                            : 'text-slate-400 dark:text-slate-500'}"
-                      >
-                        {row.percentChange > 0 ? '+' : ''}{row.percentChange.toFixed(2)}%
-                      </div>
-                      <!-- Mobile Only: Tax and Fee line below % -->
-                      <div class="mt-0.5 text-[10px] font-medium text-slate-400 md:hidden">
-                        費 {row.fee} / 稅 {row.tax}
-                      </div>
-                    </div>
-
-                    <!-- 3. Desktop Only: 檔位 (Ticks) -->
-                    <div class="hidden text-center md:col-span-1 md:block">
-                      {#if row.ticks > 0}
-                        <span
-                          class="inline-flex h-6 w-12 items-center justify-center rounded-full bg-rose-100 text-xs font-bold text-rose-600 dark:bg-rose-500/20 dark:text-rose-400"
-                          >+{row.ticks}</span
-                        >
-                      {:else if row.ticks < 0}
-                        <span
-                          class="inline-flex h-6 w-12 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-                          >{row.ticks}</span
-                        >
-                      {:else}
-                        <span
-                          class="inline-flex items-center justify-center rounded-sm bg-sky-100 px-2 py-0.5 text-xs font-bold text-sky-600 dark:bg-sky-500/20 dark:text-sky-400"
-                          >基準價</span
-                        >
-                      {/if}
-                    </div>
-
-                    <!-- 4. Desktop Only: 手續費 (Fee) -->
-                    <div
-                      class="hidden text-center text-sm font-medium text-slate-500 md:col-span-1 md:block dark:text-slate-400"
-                    >
-                      {row.fee}
-                    </div>
-
-                    <!-- 5. Desktop Only: 交易稅 (Tax) -->
-                    <div
-                      class="hidden text-center text-sm font-medium text-slate-500 md:col-span-1 md:block dark:text-slate-400"
-                    >
-                      {row.tax}
-                    </div>
-
-                    <!-- 6. 預估損益 (Profit) -->
-                    <div
-                      class="text-right font-sans text-xl font-black tracking-tight whitespace-nowrap md:col-span-1 md:text-2xl {row.profit >
-                      0
-                        ? 'text-rose-500 dark:text-rose-400'
-                        : row.profit < 0
-                          ? 'text-emerald-500 dark:text-emerald-400'
-                          : 'text-slate-500 dark:text-slate-400'}"
-                    >
-                      {row.profit > 0 ? '+' : ''}{formatMoney(row.profit)}
-                    </div>
+    <!-- Right Column: Detailed Results -->
+    <div class="lg:col-span-7">
+      {#if calculator.calcMode === 'ladder'}
+        {#if calculator.ladderResult}
+           <div in:fade>
+             <LadderGrid />
+           </div>
+        {:else}
+           <div class="flex flex-col items-center justify-center py-24 text-slate-400">
+             <ListEnd size={48} class="mb-4 opacity-20" />
+             <p class="font-bold">等待基準價輸入...</p>
+           </div>
+        {/if}
+      {:else if calculator.calcMode === 'single'}
+         {#if calculator.singleResult}
+           <div class="space-y-4" in:fade>
+              <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
+                <h3 class="mb-6 text-xs font-bold tracking-widest text-slate-400 uppercase">交易成本細項</h3>
+                <div class="space-y-4">
+                  <div class="flex justify-between border-b border-slate-50 pb-4 dark:border-slate-800">
+                    <span class="text-slate-500">買進手續費</span>
+                    <span class="font-black">{formatMoney(calculator.singleResult.buyFee)}</span>
+                  </div>
+                  <div class="flex justify-between border-b border-slate-50 pb-4 dark:border-slate-800">
+                    <span class="text-slate-500">賣出手續費</span>
+                    <span class="font-black">{formatMoney(calculator.singleResult.sellFee)}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">證券交易稅</span>
+                    <span class="font-black text-sky-500">{formatMoney(calculator.singleResult.sellTax)}</span>
                   </div>
                 </div>
-              {/each}
-            </div>
-
-            <!-- 向下展開按鈕 -->
-            <button
-              onclick={() => (ladderRows += 5)}
-              class="w-full bg-white/30 py-3 text-sm font-bold text-slate-400 transition-colors hover:bg-slate-100 hover:text-sky-500 active:bg-slate-200 dark:bg-slate-800/20 dark:hover:bg-slate-800 dark:hover:text-sky-400"
-            >
-              + 展開更多低價位檔次
-            </button>
-          </div>
-
-          <!-- 提示訊息框 -->
-          <div
-            class="rounded-2xl border border-sky-200/50 bg-sky-50/50 p-5 text-sm text-sky-700 md:text-base dark:border-sky-500/20 dark:bg-sky-900/20 dark:text-sky-300"
-          >
-            <p class="flex items-center gap-2 font-medium">
-              <ListEnd class="h-4 w-4" />
-              損益推演表說明
-            </p>
-            <p class="mt-1 opacity-80">
-              此表依照台灣股市跳動單位規則，向上向下自動推算出共 {1 + ladderRows * 2} 個檔位的漲跌損益（已扣除券商手續費與證交稅）。
-            </p>
-          </div>
-        </div>
+              </div>
+           </div>
+         {:else}
+           <div class="flex flex-col items-center justify-center py-24 text-slate-400">
+             <ListEnd size={48} class="mb-4 opacity-20" />
+             <p class="font-bold">請輸入買賣價格進行試算</p>
+           </div>
+         {/if}
       {/if}
     </div>
-  </div>
-
-  <!-- Custom Numpad Drawer overlay & component -->
-  {#if activeInput}
-    <!-- 行動版與桌機版共用的隱形遮罩 (點外側可取消焦點) -->
-    <button
-      onclick={() => (activeInput = null)}
-      class="fixed inset-0 z-40 h-full w-full cursor-default bg-transparent"
-      aria-label="關閉鍵盤"
-    ></button>
-
-    <!-- 桌機版隱藏 Numpad，完全運用實體鍵盤 -->
-    <div class="relative z-50 md:hidden">
-      <CustomNumpad value={currentInputValue} onInput={handleNumpadUpdate} onClose={() => (activeInput = null)} />
-    </div>
-  {/if}
+  </main>
 </div>
 
-<!-- 全局交易設定面板 (掛載在畫面最上層) -->
+<!-- Overlays -->
+{#if activeInput}
+  <button
+    aria-label="關閉輸入面板"
+    onclick={() => (activeInput = null)}
+    class="fixed inset-0 z-40 bg-black/5 backdrop-blur-sm md:hidden"
+  ></button>
+  <div class="fixed right-0 bottom-0 left-0 z-50 md:hidden">
+    <CustomNumpad value={currentInputValue} onInput={handleNumpadUpdate} onClose={() => (activeInput = null)} />
+  </div>
+{/if}
+
 {#if isSettingsOpen}
   <SettingsDrawer onClose={() => (isSettingsOpen = false)} />
 {/if}
+
+<style>
+  @reference "tailwindcss";
+
+  :global(body) {
+    @apply bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased;
+  }
+</style>
