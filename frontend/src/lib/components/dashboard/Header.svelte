@@ -1,6 +1,6 @@
 <script lang="ts">
   import { settings } from '$lib/stores/settings.svelte';
-  import { Settings, HelpCircle, Share2 } from 'lucide-svelte';
+  import { Settings, Share2 } from 'lucide-svelte';
 
   let { onOpenSettings, showSettings = false } = $props<{ onOpenSettings: () => void, showSettings?: boolean }>();
 </script>
@@ -34,6 +34,7 @@
         <Settings size={20} />
       </button>
     {/if}
+
     <button aria-label="分享" class="flex h-10 w-10 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
       <Share2 size={20} />
     </button>

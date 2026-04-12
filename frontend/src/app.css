@@ -53,15 +53,16 @@
 }
 
 @layer base {
+  * {
+    @apply border-border outline-ring/50 transition-colors duration-300;
+  }
+
   body {
-    @apply font-sans antialiased transition-colors duration-300 bg-background text-foreground;
+    @apply font-sans antialiased bg-background text-foreground;
   }
 
   .dark body {
     @apply bg-slate-950 text-slate-100;
-  }
-	* {
-		@apply border-border outline-ring/50;
   }
 	html {
 		@apply font-sans;

@@ -1,13 +1,10 @@
 <script lang="ts">
   import { settings } from '$lib/stores/settings.svelte';
   import { Menu, Moon, Sun } from 'lucide-svelte';
+  import { scale } from 'svelte/transition';
 
   let { title = '台股 / 當沖計算機', isMobileMenuOpen = $bindable() }: { title?: string; isMobileMenuOpen: boolean } =
     $props();
-
-  function toggleDarkMode() {
-    settings.isDarkMode = !settings.isDarkMode;
-  }
 
   function toggleMobileMenu() {
     isMobileMenuOpen = !isMobileMenuOpen;
@@ -35,14 +32,18 @@
   <div class="flex items-center gap-1.5 lg:gap-3">
     <!-- Dark Mode Toggle -->
     <button
-      onclick={toggleDarkMode}
-      class="rounded-full p-2.5 text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-sky-500 active:scale-95 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+      onclick={() => (settings.isDarkMode = !settings.isDarkMode)}
+      class="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-sky-500 active:scale-95 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-sky-400"
       aria-label={settings.isDarkMode ? '切換為淺色模式' : '切換為深色模式'}
     >
       {#if settings.isDarkMode}
-        <Sun class="h-[22px] w-[22px]" />
+        <div in:scale={{ duration: 300, start: 0.5 }}>
+          <Sun size={20} class="text-amber-400" />
+        </div>
       {:else}
-        <Moon class="h-[22px] w-[22px]" />
+        <div in:scale={{ duration: 300, start: 0.5 }}>
+          <Moon size={20} class="text-indigo-500" />
+        </div>
       {/if}
     </button>
   </div>
