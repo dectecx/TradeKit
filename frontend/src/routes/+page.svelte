@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { calculator } from '$lib/stores/calculator.svelte';
-  import { settings } from '$lib/stores/settings.svelte';
-  import { t } from '$lib/i18n/index.svelte';
+  import CustomNumpad from '$lib/components/CustomNumpad.svelte';
   import Header from '$lib/components/dashboard/Header.svelte';
+  import LadderGrid from '$lib/components/dashboard/LadderGrid.svelte';
   import StatCard from '$lib/components/dashboard/StatCard.svelte';
   import TradeInput from '$lib/components/dashboard/TradeInput.svelte';
-  import LadderGrid from '$lib/components/dashboard/LadderGrid.svelte';
-  import CustomNumpad from '$lib/components/CustomNumpad.svelte';
+  import SEO from '$lib/components/SEO.svelte';
   import SettingsDrawer from '$lib/components/SettingsDrawer.svelte';
+  import { t } from '$lib/i18n/index.svelte';
+  import { calculator } from '$lib/stores/calculator.svelte';
   import { ListEnd } from 'lucide-svelte';
   import { fade, slide } from 'svelte/transition';
 
   let isSettingsOpen = $state(false);
-  
+
   type InputField = 'buy' | 'sell' | 'quantity' | 'base' | null;
   let activeInput = $state<InputField>(null);
 
@@ -35,11 +35,16 @@
 
   let currentInputValue = $derived.by(() => {
     switch (activeInput) {
-      case 'buy': return calculator.buyPrice;
-      case 'sell': return calculator.sellPrice;
-      case 'base': return calculator.basePrice;
-      case 'quantity': return calculator.quantity;
-      default: return '';
+      case 'buy':
+        return calculator.buyPrice;
+      case 'sell':
+        return calculator.sellPrice;
+      case 'base':
+        return calculator.basePrice;
+      case 'quantity':
+        return calculator.quantity;
+      default:
+        return '';
     }
   });
 
@@ -60,10 +65,18 @@
     }
 
     switch (activeInput) {
-      case 'buy': calculator.buyPrice = val; break;
-      case 'sell': calculator.sellPrice = val; break;
-      case 'base': calculator.basePrice = val; break;
-      case 'quantity': calculator.quantity = val; break;
+      case 'buy':
+        calculator.buyPrice = val;
+        break;
+      case 'sell':
+        calculator.sellPrice = val;
+        break;
+      case 'base':
+        calculator.basePrice = val;
+        break;
+      case 'quantity':
+        calculator.quantity = val;
+        break;
     }
   }
 
@@ -76,9 +89,7 @@
   };
 </script>
 
-<svelte:head>
-  <title>TradeKit - {t('trade.title')}</title>
-</svelte:head>
+<SEO title={t('seo.trade.title')} description={t('seo.trade.description')} />
 
 <svelte:window onkeydown={handleGlobalKeydown} />
 
@@ -87,14 +98,13 @@
 
   <main class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
     <!-- Left Column: Inputs & Stats -->
-    <div class="space-y-6 lg:col-span-5 lg:sticky lg:top-8">
-      
+    <div class="space-y-6 lg:sticky lg:top-8 lg:col-span-5">
       <!-- Quick Stats Card -->
       {#if calculator.calcMode === 'single' && calculator.singleResult}
         <div in:slide>
-          <StatCard 
-            title={t('trade.profit')} 
-            value={formatMoney(calculator.singleResult.profit)} 
+          <StatCard
+            title={t('trade.profit')}
+            value={formatMoney(calculator.singleResult.profit)}
             subValue={`${t('trade.cost')}: ${formatMoney(calculator.singleResult.totalCost)} / ${t('trade.netRevenue')}: ${formatMoney(calculator.singleResult.netRevenue)}`}
             trend={calculator.singleResult.profit}
           />
@@ -102,52 +112,55 @@
       {/if}
 
       <!-- Input Card -->
-      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
-        <TradeInput onFocusInput={(f) => activeInput = f} />
+      <div
+        class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/40"
+      >
+        <TradeInput onFocusInput={(f) => (activeInput = f)} />
       </div>
-
     </div>
 
     <!-- Right Column: Detailed Results -->
     <div class="lg:col-span-7">
       {#if calculator.calcMode === 'ladder'}
         {#if calculator.ladderResult}
-           <div in:fade>
-             <LadderGrid />
-           </div>
+          <div in:fade>
+            <LadderGrid />
+          </div>
         {:else}
-           <div class="flex flex-col items-center justify-center py-24 text-slate-400">
-             <ListEnd size={48} class="mb-4 opacity-20" />
-             <p class="font-bold">{t('trade.waiting')}</p>
-           </div>
+          <div class="flex flex-col items-center justify-center py-24 text-slate-400">
+            <ListEnd size={48} class="mb-4 opacity-20" />
+            <p class="font-bold">{t('trade.waiting')}</p>
+          </div>
         {/if}
       {:else if calculator.calcMode === 'single'}
-         {#if calculator.singleResult}
-           <div class="space-y-4" in:fade>
-              <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/40">
-                <h3 class="mb-6 text-xs font-bold tracking-widest text-slate-400 uppercase">{t('trade.details')}</h3>
-                <div class="space-y-4">
-                  <div class="flex justify-between border-b border-slate-50 pb-4 dark:border-slate-800">
-                    <span class="text-slate-500">{t('trade.buyFee')}</span>
-                    <span class="font-black">{formatMoney(calculator.singleResult.buyFee)}</span>
-                  </div>
-                  <div class="flex justify-between border-b border-slate-50 pb-4 dark:border-slate-800">
-                    <span class="text-slate-500">{t('trade.sellFee')}</span>
-                    <span class="font-black">{formatMoney(calculator.singleResult.sellFee)}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-slate-500">{t('trade.sellTax')}</span>
-                    <span class="font-black text-sky-500">{formatMoney(calculator.singleResult.sellTax)}</span>
-                  </div>
+        {#if calculator.singleResult}
+          <div class="space-y-4" in:fade>
+            <div
+              class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/40"
+            >
+              <h3 class="mb-6 text-xs font-bold tracking-widest text-slate-400 uppercase">{t('trade.details')}</h3>
+              <div class="space-y-4">
+                <div class="flex justify-between border-b border-slate-50 pb-4 dark:border-slate-800">
+                  <span class="text-slate-500">{t('trade.buyFee')}</span>
+                  <span class="font-black">{formatMoney(calculator.singleResult.buyFee)}</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-50 pb-4 dark:border-slate-800">
+                  <span class="text-slate-500">{t('trade.sellFee')}</span>
+                  <span class="font-black">{formatMoney(calculator.singleResult.sellFee)}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-500">{t('trade.sellTax')}</span>
+                  <span class="font-black text-sky-500">{formatMoney(calculator.singleResult.sellTax)}</span>
                 </div>
               </div>
-           </div>
-         {:else}
-           <div class="flex flex-col items-center justify-center py-24 text-slate-400">
-             <ListEnd size={48} class="mb-4 opacity-20" />
-             <p class="font-bold">{t('trade.emptySingle')}</p>
-           </div>
-         {/if}
+            </div>
+          </div>
+        {:else}
+          <div class="flex flex-col items-center justify-center py-24 text-slate-400">
+            <ListEnd size={48} class="mb-4 opacity-20" />
+            <p class="font-bold">{t('trade.emptySingle')}</p>
+          </div>
+        {/if}
       {/if}
     </div>
   </main>
@@ -173,6 +186,6 @@
   @reference "tailwindcss";
 
   :global(body) {
-    @apply bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased;
+    @apply bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
   }
 </style>

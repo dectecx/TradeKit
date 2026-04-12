@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SEO from '$lib/components/SEO.svelte';
   import Header from '$lib/components/dashboard/Header.svelte';
   import InterestInput from '$lib/components/dashboard/InterestInput.svelte';
   import StatCard from '$lib/components/dashboard/StatCard.svelte';
@@ -92,9 +93,7 @@
   };
 </script>
 
-<svelte:head>
-  <title>TradeKit - {t('interest.title')}</title>
-</svelte:head>
+<SEO title={t('seo.interest.title')} description={t('seo.interest.description')} />
 
 <div class="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-10">
   <Header onOpenSettings={() => (isSettingsOpen = true)} showSettings={false} />

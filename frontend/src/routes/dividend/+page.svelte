@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SEO from '$lib/components/SEO.svelte';
   import { i18n, t } from '$lib/i18n/index.svelte';
   import { dividendStore } from '$lib/stores/dividend.svelte';
   import Header from '$lib/components/dashboard/Header.svelte';
@@ -28,9 +29,7 @@
   };
 </script>
 
-<svelte:head>
-  <title>TradeKit - {t('dividend.title')}</title>
-</svelte:head>
+<SEO title={t('seo.dividend.title')} description={t('seo.dividend.description')} />
 
 <div class="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-10">
   <Header onOpenSettings={() => (isSettingsOpen = true)} showSettings={false} />

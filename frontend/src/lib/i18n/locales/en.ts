@@ -110,5 +110,20 @@ export const en = {
     empty: 'Please enter parameters to calculate',
     chartTotal: 'Total Balance',
     chartPrincipal: 'Total Principal'
+  },
+  seo: {
+    description: 'TradeKit - Professional Taiwan Stock Toolbox. Providing day trade calculations, profit ladders, dividend ex-prices, and compound interest estimations to help you master transaction costs and investment returns.',
+    trade: {
+      title: 'TW Stock / Day Trade Calculator - Profit Simulation & Laddering | TradeKit',
+      description: 'The most intuitive day trading calculator for Taiwan stocks. Supports spot trading, brokerage discounts, and custom tax rates. Exclusive "Profit Ladder" feature shows your potential gains across price movements at a glance.'
+    },
+    dividend: {
+      title: 'TW Dividend Calculator - Ex-Price Estimation & Dilution Analysis | TradeKit',
+      description: 'Accurately estimate ex-dividend prices for Taiwan stocks. Supports simultaneous cash and stock dividend calculations with a detailed step-by-step breakdown.'
+    },
+    interest: {
+      title: 'Simple / Compound Interest Tool - DCA & Investment Planning | TradeKit',
+      description: 'Professional investment interest calculator. Switch between simple and compound interest, simulate DCA growth trends, and visualize your wealth growth with interactive charts.'
+    }
   }
 };

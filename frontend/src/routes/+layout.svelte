@@ -2,7 +2,7 @@
   import Footer from '$lib/components/layout/Footer.svelte';
   import Header from '$lib/components/layout/Header.svelte';
   import Sidebar from '$lib/components/layout/Sidebar.svelte';
-  import { i18n, t } from '$lib/i18n/index.svelte';
+  import { t } from '$lib/i18n/index.svelte';
   import '../app.css';
 
   import { page } from '$app/stores';
@@ -29,14 +29,7 @@
     const key = match ? routeTitles[match] : routeTitles['/'];
     return t(key);
   });
-
-  let canonicalUrl = $derived(`https://tradekit-tw.netlify.app${$page.url.pathname}`);
 </script>
-
-<svelte:head>
-  <link rel="canonical" href={canonicalUrl} />
-  <meta property="og:url" content={canonicalUrl} />
-</svelte:head>
 
 <!-- Theme Wrapper -->
 <div
