@@ -1,21 +1,26 @@
 <script lang="ts">
-  import { Calculator, Coins, History, Percent, X } from 'lucide-svelte';
+  import { i18n, t } from '$lib/i18n/index.svelte';
+  import { Calculator, Coins, History, Percent, X, Languages } from 'lucide-svelte';
   import { fade } from 'svelte/transition';
 
   import { page } from '$app/stores';
 
   // Navigation Items (reactively calculated based on current URL)
   let navItems = $derived([
-    { name: '台股 / 當沖計算機', icon: Calculator, href: '/', active: $page.url.pathname === '/' },
-    { name: '除權息計算機', icon: Percent, href: '/dividend', active: $page.url.pathname.startsWith('/dividend') },
-    { name: '單 / 複利計算機', icon: Coins, href: '/interest', active: $page.url.pathname.startsWith('/interest') },
-    { name: '歷史損益', icon: History, href: '#', active: false },
+    { name: t('nav.trade'), icon: Calculator, href: '/', active: $page.url.pathname === '/' },
+    { name: t('nav.dividend'), icon: Percent, href: '/dividend', active: $page.url.pathname.startsWith('/dividend') },
+    { name: t('nav.interest'), icon: Coins, href: '/interest', active: $page.url.pathname.startsWith('/interest') },
+    { name: t('nav.history'), icon: History, href: '#', active: false },
   ]);
 
   let { isMobileMenuOpen = $bindable(false) }: { isMobileMenuOpen: boolean } = $props();
 
   function toggleMenu() {
     isMobileMenuOpen = !isMobileMenuOpen;
+  }
+
+  function setLocale(locale: 'zh-TW' | 'en') {
+    i18n.locale = locale;
   }
 </script>
 
@@ -48,6 +53,28 @@
       </a>
     {/each}
   </nav>
+
+  <!-- Desktop Bottom Settings -->
+  <div class="border-t border-slate-200 p-4 dark:border-white/10">
+    <div class="mb-3 flex items-center gap-2 px-2 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+       <Languages size={14} />
+       <span>{t('nav.settings')}</span>
+    </div>
+    <div class="flex gap-2 rounded-2xl bg-white p-1 shadow-sm dark:bg-slate-950/50">
+       <button 
+         onclick={() => setLocale('zh-TW')}
+         class="flex-1 rounded-xl py-2 text-xs font-bold transition-all {i18n.locale === 'zh-TW' ? 'bg-sky-500 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}"
+       >
+         繁體中文
+       </button>
+       <button 
+         onclick={() => setLocale('en')}
+         class="flex-1 rounded-xl py-2 text-xs font-bold transition-all {i18n.locale === 'en' ? 'bg-sky-500 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}"
+       >
+         English
+       </button>
+    </div>
+  </div>
 </aside>
 
 <!-- Mobile Fullscreen Menu -->
@@ -92,5 +119,27 @@
         </a>
       {/each}
     </nav>
+
+    <!-- Mobile Bottom Settings -->
+    <div class="mt-auto border-t border-slate-200/50 p-6 dark:border-white/10">
+      <div class="mb-4 flex items-center gap-2 px-2 text-xs font-bold tracking-widest text-slate-400 uppercase">
+         <Languages size={16} />
+         <span>{t('nav.settings')}</span>
+      </div>
+      <div class="flex gap-2 rounded-2xl bg-white p-1.5 shadow-md dark:bg-slate-900 border border-slate-200/50 dark:border-white/5">
+         <button 
+           onclick={() => { setLocale('zh-TW'); toggleMenu(); }}
+           class="flex-1 rounded-xl py-3 text-sm font-bold transition-all {i18n.locale === 'zh-TW' ? 'bg-sky-500 text-white shadow-lg' : 'text-slate-500'}"
+         >
+           繁體中文
+         </button>
+         <button 
+           onclick={() => { setLocale('en'); toggleMenu(); }}
+           class="flex-1 rounded-xl py-3 text-sm font-bold transition-all {i18n.locale === 'en' ? 'bg-sky-500 text-white shadow-lg' : 'text-slate-500'}"
+         >
+           English
+         </button>
+      </div>
+    </div>
   </div>
 {/if}

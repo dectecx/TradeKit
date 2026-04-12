@@ -1,6 +1,7 @@
 <script lang="ts">
   import { calculator } from '$lib/stores/calculator.svelte';
   import { settings } from '$lib/stores/settings.svelte';
+  import { t } from '$lib/i18n/index.svelte';
   import Header from '$lib/components/dashboard/Header.svelte';
   import StatCard from '$lib/components/dashboard/StatCard.svelte';
   import TradeInput from '$lib/components/dashboard/TradeInput.svelte';
@@ -76,7 +77,7 @@
 </script>
 
 <svelte:head>
-  <title>TradeKit - 台股儀表板</title>
+  <title>TradeKit - {t('trade.title')}</title>
 </svelte:head>
 
 <svelte:window onkeydown={handleGlobalKeydown} />

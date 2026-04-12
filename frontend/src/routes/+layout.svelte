@@ -2,7 +2,7 @@
   import Footer from '$lib/components/layout/Footer.svelte';
   import Header from '$lib/components/layout/Header.svelte';
   import Sidebar from '$lib/components/layout/Sidebar.svelte';
-  import { settings } from '$lib/stores/settings.svelte';
+  import { i18n, t } from '$lib/i18n/index.svelte';
   import '../app.css';
 
   import { page } from '$app/stores';
@@ -12,11 +12,11 @@
   // Layout states
   let isMobileMenuOpen = $state(false);
 
-  // Route to Title Mapping
+  // Route to Title Mapping keys
   const routeTitles: Record<string, string> = {
-    '/dividend': '除權息計算機',
-    '/interest': '單 / 複利計算機',
-    '/': '台股 / 當沖計算機',
+    '/dividend': 'nav.dividend',
+    '/interest': 'nav.interest',
+    '/': 'nav.trade',
   };
 
   let pageTitle = $derived.by(() => {
@@ -26,7 +26,8 @@
       .filter((route) => route !== '/')
       .find((route) => path.startsWith(route));
 
-    return match ? routeTitles[match] : routeTitles['/'];
+    const key = match ? routeTitles[match] : routeTitles['/'];
+    return t(key);
   });
 
   let canonicalUrl = $derived(`https://tradekit-tw.netlify.app${$page.url.pathname}`);
