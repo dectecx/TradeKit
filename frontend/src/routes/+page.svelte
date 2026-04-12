@@ -82,7 +82,7 @@
 <svelte:window onkeydown={handleGlobalKeydown} />
 
 <div class="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-10">
-  <Header onOpenSettings={() => (isSettingsOpen = true)} />
+  <Header onOpenSettings={() => (isSettingsOpen = true)} showSettings={true} />
 
   <main class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
     <!-- Left Column: Inputs & Stats -->
@@ -96,17 +96,6 @@
             value={formatMoney(calculator.singleResult.profit)} 
             subValue={`總成本: ${formatMoney(calculator.singleResult.totalCost)} / 實收: ${formatMoney(calculator.singleResult.netRevenue)}`}
             trend={calculator.singleResult.profit}
-          />
-        </div>
-      {:else if calculator.calcMode === 'ladder' && calculator.ladderResult}
-        <!-- In ladder mode, we can show a summary of the base price profit or something else -->
-        {@const baseRow = calculator.ladderResult.find(r => r.ticks === 0)}
-        <div in:slide>
-          <StatCard 
-            title="基準價位損益" 
-            value={baseRow ? formatMoney(baseRow.profit) : '$0'} 
-            subValue={`交易張數: ${calculator.quantity} 張 / 手續費已折讓`}
-            trend={baseRow?.profit || 0}
           />
         </div>
       {/if}

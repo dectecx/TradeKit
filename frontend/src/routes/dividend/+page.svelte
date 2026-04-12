@@ -32,7 +32,7 @@
 </svelte:head>
 
 <div class="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-10">
-  <Header onOpenSettings={() => isSettingsOpen = true} />
+  <Header onOpenSettings={() => (isSettingsOpen = true)} showSettings={false} />
 
   <main class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
     <!-- Left Column -->

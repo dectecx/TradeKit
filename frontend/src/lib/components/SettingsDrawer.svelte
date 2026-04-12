@@ -67,9 +67,9 @@
   aria-label="關閉設定面板"
 ></button>
 
-<!-- 從底部滑出的面板 -->
+<!-- 從底部滑出的面板 (Mobile) / 側邊面板 (Desktop) -->
 <div
-  class="pb-safe fixed bottom-0 left-0 z-50 flex max-h-[85vh] w-full flex-col rounded-t-3xl border-t border-slate-200/50 bg-white/90 pt-2 shadow-[0_-8px_32px_rgba(0,0,0,0.1)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/95"
+  class="pb-safe fixed bottom-0 right-0 z-50 flex max-h-[85vh] w-full flex-col rounded-t-3xl border-t border-slate-200/50 bg-white/90 pt-2 shadow-[0_-8px_32px_rgba(0,0,0,0.1)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/95 md:bottom-8 md:top-8 md:right-8 md:h-auto md:max-h-[calc(100vh-64px)] md:w-[400px] md:rounded-3xl md:border-l md:shadow-2xl"
   transition:slide={{ duration: 300, axis: 'y' }}
 >
   <!-- 輔助拖拉條 (視覺裝飾) -->

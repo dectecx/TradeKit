@@ -57,6 +57,17 @@
           maintainAspectRatio: false,
           plugins: {
             legend: { display: true, position: 'top', align: 'end' },
+            tooltip: {
+              enabled: true,
+              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+              titleFont: { size: 13, weight: 'bold' },
+              padding: 12,
+              cornerRadius: 12,
+            }
+          },
+          interaction: {
+            mode: 'index',
+            intersect: false,
           },
           scales: {
             x: { grid: { display: false } },
@@ -85,7 +96,7 @@
 </svelte:head>
 
 <div class="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-10">
-  <Header onOpenSettings={() => isSettingsOpen = true} />
+  <Header onOpenSettings={() => (isSettingsOpen = true)} showSettings={false} />
 
   <main class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
     <!-- Left Column -->
@@ -125,7 +136,7 @@
               </div>
             </div>
 
-            <div class="h-[300px] w-full">
+            <div class="h-[220px] w-full">
               <canvas bind:this={chartCanvas}></canvas>
             </div>
           </div>
